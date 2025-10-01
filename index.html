@@ -352,9 +352,7 @@
   <header>
     <h1>Irregular Verb Coach</h1>
     <p>
-      Master every irregular English verb with tailored study paths, Catalan translations, and smart quizzes. Choose the
-      grouping that fits your ESL lesson, listen to native pronunciation with text-to-speech, and keep track of your
-      learners' toughest verbs with automatic progress recovery.
+      Irregular Verbs delivers Catalan translations, frequency-based groupings, and quick quizzes to support every ESL lesson.
     </p>
   </header>
 
@@ -365,7 +363,7 @@
         <div>
           <label for="groupingSelect">Grouping style</label>
           <select id="groupingSelect">
-            <option value="level">By classroom difficulty &amp; frequency</option>
+            <option value="frequency">By frequency</option>
             <option value="pattern">By spelling &amp; sound pattern</option>
             <option value="theme">By semantic theme</option>
           </select>
@@ -401,7 +399,6 @@
         </div>
         <div class="flex" style="font-weight: 600;">
           <span>Selected for quiz: <span id="selectionCount">0</span></span>
-          <button type="button" id="playSelectionBtn">Play selected verbs</button>
         </div>
       </div>
       <div style="overflow-x: auto;">
@@ -438,15 +435,6 @@
               <option value="mixed">Mix of forms &amp; translations</option>
               <option value="forms">English forms only</option>
               <option value="translation">Catalan to English</option>
-            </select>
-          </div>
-          <div>
-            <label for="ttsDuringQuiz">Audio support</label>
-            <select id="ttsDuringQuiz">
-              <option value="off">Silent</option>
-              <option value="question">Play question</option>
-              <option value="answer">Play correct answer</option>
-              <option value="both">Play question &amp; answer</option>
             </select>
           </div>
         </div>
@@ -499,200 +487,200 @@
 
   <script>
     const verbs = [
-      { base: "arise", past: "arose", participle: "arisen", translation: "sorgir; aixecar-se", level: "Advanced Mastery", pattern: "Vowel switch (i-o-e)", theme: "Nature & Forces" },
-      { base: "awake", past: "awoke", participle: "awoken", translation: "despertar-se", level: "Extended Practice", pattern: "Vowel switch (a-o)", theme: "Daily Routines" },
-      { base: "be", past: "was / were", participle: "been", translation: "ser; estar", level: "Core Classroom", pattern: "Unique forms", theme: "States & Being" },
-      { base: "bear", past: "bore", participle: "borne", translation: "suportar; donar a llum", level: "Advanced Mastery", pattern: "Vowel change (ea-o-o)", theme: "Nature & Forces" },
-      { base: "beat", past: "beat", participle: "beaten", translation: "colpejar; vèncer", level: "Extended Practice", pattern: "No change + -en", theme: "Actions & Impact" },
-      { base: "become", past: "became", participle: "become", translation: "esdevenir", level: "Core Classroom", pattern: "Vowel change (e-a-o)", theme: "States & Being" },
-      { base: "befall", past: "befell", participle: "befallen", translation: "succeir", level: "Advanced Mastery", pattern: "Vowel change (a-e-a)", theme: "Nature & Forces" },
-      { base: "begin", past: "began", participle: "begun", translation: "començar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Daily Routines" },
-      { base: "behold", past: "beheld", participle: "beheld", translation: "contemplar", level: "Advanced Mastery", pattern: "-old pattern", theme: "Perception" },
-      { base: "bend", past: "bent", participle: "bent", translation: "corbar", level: "Extended Practice", pattern: "-end to -ent", theme: "Actions & Impact" },
-      { base: "bereave", past: "bereaved", participle: "bereaved", translation: "privar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Emotion & Thought", altPast: ["bereft"], altParticiple: ["bereft"] },
-      { base: "beseech", past: "besought", participle: "besought", translation: "suplicar", level: "Advanced Mastery", pattern: "-ought/-aught", theme: "Communication" },
-      { base: "beset", past: "beset", participle: "beset", translation: "assetjar", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
-      { base: "bet", past: "bet", participle: "bet", translation: "apostar", level: "Core Classroom", pattern: "No change", theme: "Transactions" },
-      { base: "bid", past: "bid", participle: "bid", translation: "oferir; licitar", level: "Extended Practice", pattern: "No change", theme: "Transactions" },
-      { base: "bind", past: "bound", participle: "bound", translation: "lligar", level: "Extended Practice", pattern: "-ind to -ound", theme: "Actions & Impact" },
-      { base: "bite", past: "bit", participle: "bitten", translation: "mossegar", level: "Extended Practice", pattern: "Vowel change (i-i-e)", theme: "Nature & Forces" },
-      { base: "bleed", past: "bled", participle: "bled", translation: "sagnar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Health" },
-      { base: "blow", past: "blew", participle: "blown", translation: "bufar", level: "Extended Practice", pattern: "Vowel change (ow-ew-own)", theme: "Nature & Forces" },
-      { base: "break", past: "broke", participle: "broken", translation: "trencar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "breed", past: "bred", participle: "bred", translation: "criar", level: "Advanced Mastery", pattern: "Double-e to -ed", theme: "Nature & Forces" },
-      { base: "bring", past: "brought", participle: "brought", translation: "portar", level: "Core Classroom", pattern: "-ing to -ought", theme: "Movement" },
-      { base: "broadcast", past: "broadcast", participle: "broadcast", translation: "emetre", level: "Extended Practice", pattern: "No change", theme: "Communication" },
-      { base: "build", past: "built", participle: "built", translation: "construir", level: "Core Classroom", pattern: "-ild to -ilt", theme: "Creation" },
-      { base: "burn", past: "burned", participle: "burned", translation: "cremar", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["burnt"], altParticiple: ["burnt"] },
-      { base: "burst", past: "burst", participle: "burst", translation: "esclatar", level: "Extended Practice", pattern: "No change", theme: "Nature & Forces" },
-      { base: "buy", past: "bought", participle: "bought", translation: "comprar", level: "Core Classroom", pattern: "-uy to -ought", theme: "Transactions" },
-      { base: "cast", past: "cast", participle: "cast", translation: "llençar", level: "Extended Practice", pattern: "No change", theme: "Creation" },
-      { base: "catch", past: "caught", participle: "caught", translation: "agafar", level: "Core Classroom", pattern: "-atch to -aught", theme: "Movement" },
-      { base: "chide", past: "chided", participle: "chided", translation: "renyar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Communication", altPast: ["chid"], altParticiple: ["chidden"] },
-      { base: "choose", past: "chose", participle: "chosen", translation: "triar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Decisions" },
-      { base: "cling", past: "clung", participle: "clung", translation: "aferrar-se", level: "Extended Practice", pattern: "-ing to -ung", theme: "Emotion & Thought" },
-      { base: "clothe", past: "clothed", participle: "clothed", translation: "vestir", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["clad"], altParticiple: ["clad"] },
-      { base: "come", past: "came", participle: "come", translation: "venir", level: "Core Classroom", pattern: "Vowel change (o-a-o)", theme: "Movement" },
-      { base: "cost", past: "cost", participle: "cost", translation: "costar", level: "Core Classroom", pattern: "No change", theme: "Transactions" },
-      { base: "creep", past: "crept", participle: "crept", translation: "arrossegar-se", level: "Extended Practice", pattern: "Double-e to -ept", theme: "Movement" },
-      { base: "cut", past: "cut", participle: "cut", translation: "tallar", level: "Core Classroom", pattern: "No change", theme: "Creation" },
-      { base: "deal", past: "dealt", participle: "dealt", translation: "negociar; repartir", level: "Extended Practice", pattern: "-eal to -ealt", theme: "Transactions" },
-      { base: "dig", past: "dug", participle: "dug", translation: "cavar", level: "Extended Practice", pattern: "Short vowel + g", theme: "Nature & Forces" },
-      { base: "do", past: "did", participle: "done", translation: "fer", level: "Core Classroom", pattern: "Unique forms", theme: "Daily Routines" },
-      { base: "draw", past: "drew", participle: "drawn", translation: "dibuixar; estirar", level: "Extended Practice", pattern: "Vowel change (aw-ew-awn)", theme: "Creation" },
-      { base: "dream", past: "dreamed", participle: "dreamed", translation: "somiar", level: "Core Classroom", pattern: "Regular alt", theme: "Emotion & Thought", altPast: ["dreamt"], altParticiple: ["dreamt"] },
-      { base: "drink", past: "drank", participle: "drunk", translation: "beure", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Daily Routines" },
-      { base: "dive", past: "dived", participle: "dived", translation: "capbussar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["dove"], altParticiple: ["dove"] },
-      { base: "drive", past: "drove", participle: "driven", translation: "conduir", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Movement" },
-      { base: "dwell", past: "dwelled", participle: "dwelled", translation: "residir", level: "Advanced Mastery", pattern: "Regular alt", theme: "Daily Routines", altPast: ["dwelt"], altParticiple: ["dwelt"] },
-      { base: "eat", past: "ate", participle: "eaten", translation: "menjar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Daily Routines" },
-      { base: "fall", past: "fell", participle: "fallen", translation: "caure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Movement" },
-      { base: "feed", past: "fed", participle: "fed", translation: "alimentar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Daily Routines" },
-      { base: "feel", past: "felt", participle: "felt", translation: "sentir", level: "Core Classroom", pattern: "Double-e to -elt", theme: "Emotion & Thought" },
-      { base: "fight", past: "fought", participle: "fought", translation: "lluitar", level: "Core Classroom", pattern: "-ight to -ought", theme: "Actions & Impact" },
-      { base: "find", past: "found", participle: "found", translation: "trobar", level: "Core Classroom", pattern: "-ind to -ound", theme: "Decisions" },
-      { base: "flee", past: "fled", participle: "fled", translation: "fugir", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Movement" },
-      { base: "fling", past: "flung", participle: "flung", translation: "llençar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Actions & Impact" },
-      { base: "fly", past: "flew", participle: "flown", translation: "volar", level: "Core Classroom", pattern: "Vowel change (y-ew-own)", theme: "Movement" },
-      { base: "forbid", past: "forbade", participle: "forbidden", translation: "prohibir", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Communication" }
+      { base: "arise", past: "arose", participle: "arisen", translation: "sorgir; aixecar-se", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces" },
+      { base: "awake", past: "awoke", participle: "awoken", translation: "despertar-se", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "be", past: "was / were", participle: "been", translation: "ser; estar", frequency: "Common", pattern: "Suppletive / unique — 4", theme: "States & Being" },
+      { base: "bear", past: "bore", participle: "borne", translation: "suportar; donar a llum", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces" },
+      { base: "beat", past: "beat", participle: "beaten", translation: "colpejar; vèncer", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "become", past: "became", participle: "become", translation: "esdevenir", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "States & Being" },
+      { base: "befall", past: "befell", participle: "befallen", translation: "succeir", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces" },
+      { base: "begin", past: "began", participle: "begun", translation: "començar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "behold", past: "beheld", participle: "beheld", translation: "contemplar", frequency: "Least common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Perception" },
+      { base: "bend", past: "bent", participle: "bent", translation: "corbar", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Actions & Impact" },
+      { base: "bereave", past: "bereaved / bereft", participle: "bereaved / bereft", translation: "privar", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Emotion & Thought", altPast: ["bereft"], altParticiple: ["bereft"] },
+      { base: "beseech", past: "besought", participle: "besought", translation: "suplicar", frequency: "Least common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Communication" },
+      { base: "beset", past: "beset", participle: "beset", translation: "assetjar", frequency: "Least common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "bet", past: "bet", participle: "bet", translation: "apostar", frequency: "Common", pattern: "No change — 25", theme: "Transactions" },
+      { base: "bid", past: "bid", participle: "bid", translation: "oferir; licitar", frequency: "Less common", pattern: "No change — 25", theme: "Transactions" },
+      { base: "bind", past: "bound", participle: "bound", translation: "lligar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Actions & Impact" },
+      { base: "bite", past: "bit", participle: "bitten", translation: "mossegar", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces" },
+      { base: "bleed", past: "bled", participle: "bled", translation: "sagnar", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Health" },
+      { base: "blow", past: "blew", participle: "blown", translation: "bufar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces" },
+      { base: "break", past: "broke", participle: "broken", translation: "trencar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "breed", past: "bred", participle: "bred", translation: "criar", frequency: "Least common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Nature & Forces" },
+      { base: "bring", past: "brought", participle: "brought", translation: "portar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Movement" },
+      { base: "broadcast", past: "broadcast", participle: "broadcast", translation: "emetre", frequency: "Less common", pattern: "No change — 25", theme: "Communication" },
+      { base: "build", past: "built", participle: "built", translation: "construir", frequency: "Common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Creation" },
+      { base: "burn", past: "burned / burnt", participle: "burned / burnt", translation: "cremar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Nature & Forces", altPast: ["burnt"], altParticiple: ["burnt"] },
+      { base: "burst", past: "burst", participle: "burst", translation: "esclatar", frequency: "Less common", pattern: "No change — 25", theme: "Nature & Forces" },
+      { base: "buy", past: "bought", participle: "bought", translation: "comprar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Transactions" },
+      { base: "cast", past: "cast", participle: "cast", translation: "llençar", frequency: "Less common", pattern: "No change — 25", theme: "Creation" },
+      { base: "catch", past: "caught", participle: "caught", translation: "agafar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Movement" },
+      { base: "chide", past: "chided / chid", participle: "chided / chidden", translation: "renyar", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Communication", altPast: ["chid"], altParticiple: ["chidden"] },
+      { base: "choose", past: "chose", participle: "chosen", translation: "triar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Decisions" },
+      { base: "cling", past: "clung", participle: "clung", translation: "aferrar-se", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Emotion & Thought" },
+      { base: "clothe", past: "clothed / clad", participle: "clothed / clad", translation: "vestir", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altPast: ["clad"], altParticiple: ["clad"] },
+      { base: "come", past: "came", participle: "come", translation: "venir", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Movement" },
+      { base: "cost", past: "cost", participle: "cost", translation: "costar", frequency: "Common", pattern: "No change — 25", theme: "Transactions" },
+      { base: "creep", past: "crept", participle: "crept", translation: "arrossegar-se", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Movement" },
+      { base: "cut", past: "cut", participle: "cut", translation: "tallar", frequency: "Common", pattern: "No change — 25", theme: "Creation" },
+      { base: "deal", past: "dealt", participle: "dealt", translation: "negociar; repartir", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Transactions" },
+      { base: "dig", past: "dug", participle: "dug", translation: "cavar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Nature & Forces" },
+      { base: "do", past: "did", participle: "done", translation: "fer", frequency: "Common", pattern: "Suppletive / unique — 4", theme: "Daily Routines" },
+      { base: "draw", past: "drew", participle: "drawn", translation: "dibuixar; estirar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Creation" },
+      { base: "dream", past: "dreamed / dreamt", participle: "dreamed / dreamt", translation: "somiar", frequency: "Common", pattern: "Regular alternative available (-ed) — 24", theme: "Emotion & Thought", altPast: ["dreamt"], altParticiple: ["dreamt"] },
+      { base: "drink", past: "drank", participle: "drunk", translation: "beure", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "dive", past: "dived / dove", participle: "dived / dove", translation: "capbussar-se", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Movement", altPast: ["dove"], altParticiple: ["dove"] },
+      { base: "drive", past: "drove", participle: "driven", translation: "conduir", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "dwell", past: "dwelled / dwelt", participle: "dwelled / dwelt", translation: "residir", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altPast: ["dwelt"], altParticiple: ["dwelt"] },
+      { base: "eat", past: "ate", participle: "eaten", translation: "menjar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Daily Routines" },
+      { base: "fall", past: "fell", participle: "fallen", translation: "caure", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "feed", past: "fed", participle: "fed", translation: "alimentar", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Daily Routines" },
+      { base: "feel", past: "felt", participle: "felt", translation: "sentir", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Emotion & Thought" },
+      { base: "fight", past: "fought", participle: "fought", translation: "lluitar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Actions & Impact" },
+      { base: "find", past: "found", participle: "found", translation: "trobar", frequency: "Common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Decisions" },
+      { base: "flee", past: "fled", participle: "fled", translation: "fugir", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Movement" },
+      { base: "fling", past: "flung", participle: "flung", translation: "llençar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Actions & Impact" },
+      { base: "fly", past: "flew", participle: "flown", translation: "volar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "forbid", past: "forbade", participle: "forbidden", translation: "prohibir", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Communication" }
     ];
     verbs.push(
-      { base: "forget", past: "forgot", participle: "forgotten", translation: "oblidar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
-      { base: "forgive", past: "forgave", participle: "forgiven", translation: "perdonar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
-      { base: "forsake", past: "forsook", participle: "forsaken", translation: "abandonar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
-      { base: "freeze", past: "froze", participle: "frozen", translation: "gelar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Nature & Forces" },
-      { base: "get", past: "got", participle: "gotten", translation: "aconseguir", level: "Core Classroom", pattern: "Irregular + -en", theme: "Transactions", altParticiple: ["got"] },
-      { base: "give", past: "gave", participle: "given", translation: "donar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Transactions" },
-      { base: "go", past: "went", participle: "gone", translation: "anar", level: "Core Classroom", pattern: "Suppletive", theme: "Movement" },
-      { base: "grind", past: "ground", participle: "ground", translation: "moldre", level: "Advanced Mastery", pattern: "-ind to -ound", theme: "Creation" },
-      { base: "grow", past: "grew", participle: "grown", translation: "créixer", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Nature & Forces" },
-      { base: "hang", past: "hanged", participle: "hanged", translation: "penjar", level: "Extended Practice", pattern: "Regular alt", theme: "Actions & Impact", altPast: ["hung"], altParticiple: ["hung"] },
-      { base: "have", past: "had", participle: "had", translation: "tenir", level: "Core Classroom", pattern: "Irregular consonant change", theme: "States & Being" },
-      { base: "hear", past: "heard", participle: "heard", translation: "sentir", level: "Core Classroom", pattern: "-ear to -eard", theme: "Perception" },
-      { base: "hide", past: "hid", participle: "hidden", translation: "amagar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "hit", past: "hit", participle: "hit", translation: "copar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
-      { base: "hold", past: "held", participle: "held", translation: "subjectar", level: "Core Classroom", pattern: "-old pattern", theme: "Actions & Impact" },
-      { base: "hurt", past: "hurt", participle: "hurt", translation: "fer mal", level: "Core Classroom", pattern: "No change", theme: "Health" },
-      { base: "keep", past: "kept", participle: "kept", translation: "mantenir", level: "Core Classroom", pattern: "Double-e to -ept", theme: "States & Being" },
-      { base: "kneel", past: "kneeled", participle: "kneeled", translation: "agenollar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["knelt"], altParticiple: ["knelt"] },
-      { base: "knit", past: "knitted", participle: "knitted", translation: "teixir", level: "Advanced Mastery", pattern: "Regular alt", theme: "Creation", altPast: ["knit"], altParticiple: ["knit"] },
-      { base: "know", past: "knew", participle: "known", translation: "saber; conèixer", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Emotion & Thought" },
-      { base: "lay", past: "laid", participle: "laid", translation: "posar", level: "Extended Practice", pattern: "-ay to -aid", theme: "Actions & Impact" },
-      { base: "lead", past: "led", participle: "led", translation: "guiar", level: "Core Classroom", pattern: "Vowel reduction", theme: "Actions & Impact" },
-      { base: "lean", past: "leaned", participle: "leaned", translation: "inclinar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["leant"], altParticiple: ["leant"] },
-      { base: "leap", past: "leaped", participle: "leaped", translation: "saltar", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["leapt"], altParticiple: ["leapt"] },
-      { base: "leave", past: "left", participle: "left", translation: "marxar", level: "Core Classroom", pattern: "-eave to -eft", theme: "Movement" },
-      { base: "lend", past: "lent", participle: "lent", translation: "prestar", level: "Core Classroom", pattern: "-end to -ent", theme: "Transactions" },
-      { base: "let", past: "let", participle: "let", translation: "deixar", level: "Core Classroom", pattern: "No change", theme: "Communication" },
-      { base: "lie", past: "lay", participle: "lain", translation: "estirar-se", level: "Extended Practice", pattern: "Vowel change + -n", theme: "Daily Routines" },
-      { base: "light", past: "lighted", participle: "lighted", translation: "encendre", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["lit"], altParticiple: ["lit"] },
-      { base: "lose", past: "lost", participle: "lost", translation: "perdre", level: "Core Classroom", pattern: "Consonant swap", theme: "Emotion & Thought" },
-      { base: "learn", past: "learned", participle: "learned", translation: "aprendre", level: "Core Classroom", pattern: "Regular alt", theme: "Daily Routines", altPast: ["learnt"], altParticiple: ["learnt"] },
-      { base: "make", past: "made", participle: "made", translation: "fer", level: "Core Classroom", pattern: "Consonant swap", theme: "Creation" },
-      { base: "mean", past: "meant", participle: "meant", translation: "significar", level: "Core Classroom", pattern: "-ean to -eant", theme: "Communication" },
-      { base: "meet", past: "met", participle: "met", translation: "trobar-se", level: "Core Classroom", pattern: "Double-e to -et", theme: "Communication" },
-      { base: "mislay", past: "mislaid", participle: "mislaid", translation: "desaparèixer (temporalment)", level: "Advanced Mastery", pattern: "-ay to -aid", theme: "Daily Routines" },
-      { base: "mistake", past: "mistook", participle: "mistaken", translation: "equivocar-se", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
-      { base: "misunderstand", past: "misunderstood", participle: "misunderstood", translation: "malentendre", level: "Extended Practice", pattern: "Vowel change (oo)", theme: "Communication" },
-      { base: "overcome", past: "overcame", participle: "overcome", translation: "superar", level: "Extended Practice", pattern: "Vowel change (o-a-o)", theme: "Emotion & Thought" },
-      { base: "overdo", past: "overdid", participle: "overdone", translation: "exagerar", level: "Advanced Mastery", pattern: "Unique forms", theme: "Emotion & Thought" },
-      { base: "overhear", past: "overheard", participle: "overheard", translation: "sentir sense voler", level: "Extended Practice", pattern: "-ear to -eard", theme: "Perception" },
-      { base: "overtake", past: "overtook", participle: "overtaken", translation: "avançar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Movement" },
-      { base: "partake", past: "partook", participle: "partaken", translation: "participar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Daily Routines" },
-      { base: "pay", past: "paid", participle: "paid", translation: "pagar", level: "Core Classroom", pattern: "-ay to -aid", theme: "Transactions" },
-      { base: "plead", past: "pleaded", participle: "pleaded", translation: "suplicar", level: "Extended Practice", pattern: "Regular alt", theme: "Communication", altPast: ["pled"], altParticiple: ["pled"] },
-      { base: "prove", past: "proved", participle: "proved", translation: "demostrar", level: "Extended Practice", pattern: "Regular alt", theme: "Communication", altParticiple: ["proven"] },
-      { base: "put", past: "put", participle: "put", translation: "posar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
-      { base: "quit", past: "quit", participle: "quit", translation: "deixar", level: "Extended Practice", pattern: "No change", theme: "Daily Routines" },
-      { base: "read", past: "read", participle: "read", translation: "llegir", level: "Core Classroom", pattern: "No change (pronunciation shift)", theme: "Communication" },
-      { base: "rid", past: "rid", participle: "rid", translation: "lliurar-se", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
-      { base: "ride", past: "rode", participle: "ridden", translation: "muntar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Movement" },
-      { base: "ring", past: "rang", participle: "rung", translation: "tocar (campana)", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Communication" },
-      { base: "rise", past: "rose", participle: "risen", translation: "elevar-se", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Nature & Forces" },
-      { base: "run", past: "ran", participle: "run", translation: "córrer", level: "Core Classroom", pattern: "Vowel change (u-a-u)", theme: "Movement" }
+      { base: "forget", past: "forgot", participle: "forgotten", translation: "oblidar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "forgive", past: "forgave", participle: "forgiven", translation: "perdonar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "forsake", past: "forsook", participle: "forsaken", translation: "abandonar", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "freeze", past: "froze", participle: "frozen", translation: "gelar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces" },
+      { base: "get", past: "got", participle: "gotten", translation: "aconseguir", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Transactions", altParticiple: ["got"] },
+      { base: "give", past: "gave", participle: "given", translation: "donar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Transactions" },
+      { base: "go", past: "went", participle: "gone", translation: "anar", frequency: "Common", pattern: "Suppletive / unique — 4", theme: "Movement" },
+      { base: "grind", past: "ground", participle: "ground", translation: "moldre", frequency: "Least common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Creation" },
+      { base: "grow", past: "grew", participle: "grown", translation: "créixer", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces" },
+      { base: "hang", past: "hanged / hung", participle: "hanged / hung", translation: "penjar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Actions & Impact", altPast: ["hung"], altParticiple: ["hung"] },
+      { base: "have", past: "had", participle: "had", translation: "tenir", frequency: "Common", pattern: "Consonant/spelling tweaks — 8", theme: "States & Being" },
+      { base: "hear", past: "heard", participle: "heard", translation: "sentir", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Perception" },
+      { base: "hide", past: "hid", participle: "hidden", translation: "amagar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "hit", past: "hit", participle: "hit", translation: "copar", frequency: "Common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "hold", past: "held", participle: "held", translation: "subjectar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Actions & Impact" },
+      { base: "hurt", past: "hurt", participle: "hurt", translation: "fer mal", frequency: "Common", pattern: "No change — 25", theme: "Health" },
+      { base: "keep", past: "kept", participle: "kept", translation: "mantenir", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "States & Being" },
+      { base: "kneel", past: "kneeled / knelt", participle: "kneeled / knelt", translation: "agenollar-se", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altPast: ["knelt"], altParticiple: ["knelt"] },
+      { base: "knit", past: "knitted / knit", participle: "knitted / knit", translation: "teixir", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Creation", altPast: ["knit"], altParticiple: ["knit"] },
+      { base: "know", past: "knew", participle: "known", translation: "saber; conèixer", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "lay", past: "laid", participle: "laid", translation: "posar", frequency: "Less common", pattern: "Consonant/spelling tweaks — 8", theme: "Actions & Impact" },
+      { base: "lead", past: "led", participle: "led", translation: "guiar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Actions & Impact" },
+      { base: "lean", past: "leaned / leant", participle: "leaned / leant", translation: "inclinar-se", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Movement", altPast: ["leant"], altParticiple: ["leant"] },
+      { base: "leap", past: "leaped / leapt", participle: "leaped / leapt", translation: "saltar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Movement", altPast: ["leapt"], altParticiple: ["leapt"] },
+      { base: "leave", past: "left", participle: "left", translation: "marxar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Movement" },
+      { base: "lend", past: "lent", participle: "lent", translation: "prestar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Transactions" },
+      { base: "let", past: "let", participle: "let", translation: "deixar", frequency: "Common", pattern: "No change — 25", theme: "Communication" },
+      { base: "lie", past: "lay", participle: "lain", translation: "estirar-se", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Daily Routines" },
+      { base: "light", past: "lighted / lit", participle: "lighted / lit", translation: "encendre", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Nature & Forces", altPast: ["lit"], altParticiple: ["lit"] },
+      { base: "lose", past: "lost", participle: "lost", translation: "perdre", frequency: "Common", pattern: "Consonant/spelling tweaks — 8", theme: "Emotion & Thought" },
+      { base: "learn", past: "learned / learnt", participle: "learned / learnt", translation: "aprendre", frequency: "Common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altPast: ["learnt"], altParticiple: ["learnt"] },
+      { base: "make", past: "made", participle: "made", translation: "fer", frequency: "Common", pattern: "Consonant/spelling tweaks — 8", theme: "Creation" },
+      { base: "mean", past: "meant", participle: "meant", translation: "significar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Communication" },
+      { base: "meet", past: "met", participle: "met", translation: "trobar-se", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Communication" },
+      { base: "mislay", past: "mislaid", participle: "mislaid", translation: "desaparèixer (temporalment)", frequency: "Least common", pattern: "Consonant/spelling tweaks — 8", theme: "Daily Routines" },
+      { base: "mistake", past: "mistook", participle: "mistaken", translation: "equivocar-se", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "misunderstand", past: "misunderstood", participle: "misunderstood", translation: "malentendre", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Communication" },
+      { base: "overcome", past: "overcame", participle: "overcome", translation: "superar", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Emotion & Thought" },
+      { base: "overdo", past: "overdid", participle: "overdone", translation: "exagerar", frequency: "Least common", pattern: "Suppletive / unique — 4", theme: "Emotion & Thought" },
+      { base: "overhear", past: "overheard", participle: "overheard", translation: "sentir sense voler", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Perception" },
+      { base: "overtake", past: "overtook", participle: "overtaken", translation: "avançar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "partake", past: "partook", participle: "partaken", translation: "participar", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Daily Routines" },
+      { base: "pay", past: "paid", participle: "paid", translation: "pagar", frequency: "Common", pattern: "Consonant/spelling tweaks — 8", theme: "Transactions" },
+      { base: "plead", past: "pleaded / pled", participle: "pleaded / pled", translation: "suplicar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Communication", altPast: ["pled"], altParticiple: ["pled"] },
+      { base: "prove", past: "proved", participle: "proved / proven", translation: "demostrar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Communication", altParticiple: ["proven"] },
+      { base: "put", past: "put", participle: "put", translation: "posar", frequency: "Common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "quit", past: "quit", participle: "quit", translation: "deixar", frequency: "Less common", pattern: "No change — 25", theme: "Daily Routines" },
+      { base: "read", past: "read", participle: "read", translation: "llegir", frequency: "Common", pattern: "No change — 25", theme: "Communication" },
+      { base: "rid", past: "rid", participle: "rid", translation: "lliurar-se", frequency: "Least common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "ride", past: "rode", participle: "ridden", translation: "muntar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "ring", past: "rang", participle: "rung", translation: "tocar (campana)", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Communication" },
+      { base: "rise", past: "rose", participle: "risen", translation: "elevar-se", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces" },
+      { base: "run", past: "ran", participle: "run", translation: "córrer", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Movement" }
     );
     verbs.push(
-      { base: "say", past: "said", participle: "said", translation: "dir", level: "Core Classroom", pattern: "Consonant swap", theme: "Communication" },
-      { base: "see", past: "saw", participle: "seen", translation: "veure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Perception" },
-      { base: "seek", past: "sought", participle: "sought", translation: "cercar", level: "Extended Practice", pattern: "-eek to -ought", theme: "Decisions" },
-      { base: "sell", past: "sold", participle: "sold", translation: "vendre", level: "Core Classroom", pattern: "-ell to -old", theme: "Transactions" },
-      { base: "send", past: "sent", participle: "sent", translation: "enviar", level: "Core Classroom", pattern: "-end to -ent", theme: "Communication" },
-      { base: "set", past: "set", participle: "set", translation: "col·locar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
-      { base: "sew", past: "sewed", participle: "sewn", translation: "cosir", level: "Extended Practice", pattern: "Irregular -n", theme: "Creation", altParticiple: ["sewed"] },
-      { base: "shake", past: "shook", participle: "shaken", translation: "sacsejar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "shave", past: "shaved", participle: "shaved", translation: "afaitar", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altParticiple: ["shaven"] },
-      { base: "shear", past: "sheared", participle: "shorn", translation: "tallar (llana)", level: "Advanced Mastery", pattern: "Irregular -orn", theme: "Nature & Forces" },
-      { base: "shed", past: "shed", participle: "shed", translation: "perdre; vessar", level: "Extended Practice", pattern: "No change", theme: "Nature & Forces" },
-      { base: "shine", past: "shined", participle: "shined", translation: "brillar", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["shone"], altParticiple: ["shone"] },
-      { base: "shoot", past: "shot", participle: "shot", translation: "disparar", level: "Extended Practice", pattern: "Vowel shortening", theme: "Actions & Impact" },
-      { base: "show", past: "showed", participle: "shown", translation: "mostrar", level: "Core Classroom", pattern: "Irregular -n", theme: "Communication", altParticiple: ["showed"] },
-      { base: "shrink", past: "shrank", participle: "shrunk", translation: "encongir-se", level: "Advanced Mastery", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["shrunken"] },
-      { base: "shut", past: "shut", participle: "shut", translation: "tancar", level: "Core Classroom", pattern: "No change", theme: "Daily Routines" },
-      { base: "sing", past: "sang", participle: "sung", translation: "cantar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Communication" },
-      { base: "sink", past: "sank", participle: "sunk", translation: "enfonsar", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["sunken"] },
-      { base: "sit", past: "sat", participle: "sat", translation: "seure", level: "Core Classroom", pattern: "Vowel shortening", theme: "Daily Routines" },
-      { base: "slay", past: "slew", participle: "slain", translation: "matar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "sleep", past: "slept", participle: "slept", translation: "dormir", level: "Core Classroom", pattern: "Double-e to -ept", theme: "Daily Routines" },
-      { base: "slide", past: "slid", participle: "slid", translation: "lliscar", level: "Extended Practice", pattern: "Silent-e drop", theme: "Movement" },
-      { base: "sling", past: "slung", participle: "slung", translation: "llançar", level: "Advanced Mastery", pattern: "-ing to -ung", theme: "Actions & Impact" },
-      { base: "slit", past: "slit", participle: "slit", translation: "esqueixar", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
-      { base: "smell", past: "smelled", participle: "smelled", translation: "olorar", level: "Core Classroom", pattern: "Regular alt", theme: "Perception", altPast: ["smelt"], altParticiple: ["smelt"] },
-      { base: "sow", past: "sowed", participle: "sown", translation: "sembrar", level: "Advanced Mastery", pattern: "Irregular -n", theme: "Nature & Forces", altParticiple: ["sowed"] },
-      { base: "speak", past: "spoke", participle: "spoken", translation: "parlar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Communication" },
-      { base: "speed", past: "sped", participle: "sped", translation: "accelerar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Movement" },
-      { base: "spell", past: "spelled", participle: "spelled", translation: "lletrejar", level: "Core Classroom", pattern: "Regular alt", theme: "Communication", altPast: ["spelt"], altParticiple: ["spelt"] },
-      { base: "spend", past: "spent", participle: "spent", translation: "gastar", level: "Core Classroom", pattern: "-end to -ent", theme: "Transactions" },
-      { base: "spin", past: "spun", participle: "spun", translation: "girar", level: "Extended Practice", pattern: "Short vowel + -un", theme: "Movement" },
-      { base: "spit", past: "spit", participle: "spit", translation: "escopir", level: "Extended Practice", pattern: "No change", theme: "Daily Routines", altPast: ["spat"], altParticiple: ["spat"] },
-      { base: "split", past: "split", participle: "split", translation: "dividir", level: "Extended Practice", pattern: "No change", theme: "Creation" },
-      { base: "spoil", past: "spoiled", participle: "spoiled", translation: "fer malbé", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["spoilt"], altParticiple: ["spoilt"] },
-      { base: "spread", past: "spread", participle: "spread", translation: "estendre", level: "Core Classroom", pattern: "No change", theme: "Daily Routines" },
-      { base: "spring", past: "sprang", participle: "sprung", translation: "saltar", level: "Advanced Mastery", pattern: "Vowel change (i-a-u)", theme: "Movement" },
-      { base: "stand", past: "stood", participle: "stood", translation: "estar dret", level: "Core Classroom", pattern: "Vowel change (a-oo)", theme: "Daily Routines" },
-      { base: "steal", past: "stole", participle: "stolen", translation: "robar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "stick", past: "stuck", participle: "stuck", translation: "enganxar", level: "Extended Practice", pattern: "-ick to -uck", theme: "Actions & Impact" },
-      { base: "sting", past: "stung", participle: "stung", translation: "picar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Nature & Forces" },
-      { base: "stink", past: "stank", participle: "stunk", translation: "fer pudor", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["stunk"] },
-      { base: "stride", past: "strode", participle: "stridden", translation: "avançar a grans passes", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Movement" },
-      { base: "strike", past: "struck", participle: "struck", translation: "colpejar", level: "Extended Practice", pattern: "-ike to -uck", theme: "Actions & Impact", altParticiple: ["stricken"] },
-      { base: "string", past: "strung", participle: "strung", translation: "enfilar", level: "Advanced Mastery", pattern: "-ing to -ung", theme: "Creation" },
-      { base: "strive", past: "strove", participle: "striven", translation: "esforçar-se", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
-      { base: "swear", past: "swore", participle: "sworn", translation: "jurar", level: "Extended Practice", pattern: "Vowel change + -rn", theme: "Communication" },
-      { base: "sweat", past: "sweated", participle: "sweated", translation: "suar", level: "Extended Practice", pattern: "Regular alt", theme: "Health", altPast: ["sweat"], altParticiple: ["sweat"] },
-      { base: "sweep", past: "swept", participle: "swept", translation: "escombrar", level: "Core Classroom", pattern: "Double-e to -ept", theme: "Daily Routines" },
-      { base: "swell", past: "swelled", participle: "swelled", translation: "inflar-se", level: "Advanced Mastery", pattern: "Regular alt", theme: "Health", altParticiple: ["swollen"] },
-      { base: "swim", past: "swam", participle: "swum", translation: "nedar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Movement" },
-      { base: "swing", past: "swung", participle: "swung", translation: "balancejar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Movement" },
-      { base: "take", past: "took", participle: "taken", translation: "prendre", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
-      { base: "teach", past: "taught", participle: "taught", translation: "ensenyar", level: "Core Classroom", pattern: "-each to -aught", theme: "Communication" },
-      { base: "tear", past: "tore", participle: "torn", translation: "esquinçar", level: "Extended Practice", pattern: "Vowel change + -rn", theme: "Actions & Impact" },
-      { base: "tell", past: "told", participle: "told", translation: "explicar", level: "Core Classroom", pattern: "-ell to -old", theme: "Communication" },
-      { base: "think", past: "thought", participle: "thought", translation: "pensar", level: "Core Classroom", pattern: "-ink to -ought", theme: "Emotion & Thought" },
-      { base: "thrive", past: "thrived", participle: "thrived", translation: "prosperar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["throve"], altParticiple: ["thriven"] },
-      { base: "throw", past: "threw", participle: "thrown", translation: "llençar", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Actions & Impact" },
-      { base: "thrust", past: "thrust", participle: "thrust", translation: "clavar", level: "Extended Practice", pattern: "No change", theme: "Actions & Impact" },
-      { base: "understand", past: "understood", participle: "understood", translation: "entendre", level: "Core Classroom", pattern: "Vowel change (oo)", theme: "Emotion & Thought" },
-      { base: "uphold", past: "upheld", participle: "upheld", translation: "mantenir", level: "Advanced Mastery", pattern: "-hold pattern", theme: "States & Being" },
-      { base: "upset", past: "upset", participle: "upset", translation: "trasbalsar", level: "Extended Practice", pattern: "No change", theme: "Emotion & Thought" }
+      { base: "say", past: "said", participle: "said", translation: "dir", frequency: "Common", pattern: "Consonant/spelling tweaks — 8", theme: "Communication" },
+      { base: "see", past: "saw", participle: "seen", translation: "veure", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Perception" },
+      { base: "seek", past: "sought", participle: "sought", translation: "cercar", frequency: "Less common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Decisions" },
+      { base: "sell", past: "sold", participle: "sold", translation: "vendre", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Transactions" },
+      { base: "send", past: "sent", participle: "sent", translation: "enviar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Communication" },
+      { base: "set", past: "set", participle: "set", translation: "col·locar", frequency: "Common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "sew", past: "sewed", participle: "sewn", translation: "cosir", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Creation", altParticiple: ["sewed"] },
+      { base: "shake", past: "shook", participle: "shaken", translation: "sacsejar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "shave", past: "shaved", participle: "shaved / shaven", translation: "afaitar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altParticiple: ["shaven"] },
+      { base: "shear", past: "sheared", participle: "shorn", translation: "tallar (llana)", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces" },
+      { base: "shed", past: "shed", participle: "shed", translation: "perdre; vessar", frequency: "Less common", pattern: "No change — 25", theme: "Nature & Forces" },
+      { base: "shine", past: "shined / shone", participle: "shined / shone", translation: "brillar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Nature & Forces", altPast: ["shone"], altParticiple: ["shone"] },
+      { base: "shoot", past: "shot", participle: "shot", translation: "disparar", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Actions & Impact" },
+      { base: "show", past: "showed", participle: "shown", translation: "mostrar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Communication", altParticiple: ["showed"] },
+      { base: "shrink", past: "shrank", participle: "shrunk", translation: "encongir-se", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces", altParticiple: ["shrunken"] },
+      { base: "shut", past: "shut", participle: "shut", translation: "tancar", frequency: "Common", pattern: "No change — 25", theme: "Daily Routines" },
+      { base: "sing", past: "sang", participle: "sung", translation: "cantar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Communication" },
+      { base: "sink", past: "sank", participle: "sunk", translation: "enfonsar", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces", altParticiple: ["sunken"] },
+      { base: "sit", past: "sat", participle: "sat", translation: "seure", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "slay", past: "slew", participle: "slain", translation: "matar", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "sleep", past: "slept", participle: "slept", translation: "dormir", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Daily Routines" },
+      { base: "slide", past: "slid", participle: "slid", translation: "lliscar", frequency: "Less common", pattern: "Consonant/spelling tweaks — 8", theme: "Movement" },
+      { base: "sling", past: "slung", participle: "slung", translation: "llançar", frequency: "Least common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Actions & Impact" },
+      { base: "slit", past: "slit", participle: "slit", translation: "esqueixar", frequency: "Least common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "smell", past: "smelled / smelt", participle: "smelled / smelt", translation: "olorar", frequency: "Common", pattern: "Regular alternative available (-ed) — 24", theme: "Perception", altPast: ["smelt"], altParticiple: ["smelt"] },
+      { base: "sow", past: "sowed", participle: "sown", translation: "sembrar", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Nature & Forces", altParticiple: ["sowed"] },
+      { base: "speak", past: "spoke", participle: "spoken", translation: "parlar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Communication" },
+      { base: "speed", past: "sped", participle: "sped", translation: "accelerar", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Movement" },
+      { base: "spell", past: "spelled / spelt", participle: "spelled / spelt", translation: "lletrejar", frequency: "Common", pattern: "Regular alternative available (-ed) — 24", theme: "Communication", altPast: ["spelt"], altParticiple: ["spelt"] },
+      { base: "spend", past: "spent", participle: "spent", translation: "gastar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Transactions" },
+      { base: "spin", past: "spun", participle: "spun", translation: "girar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Movement" },
+      { base: "spit", past: "spit", participle: "spit", translation: "escopir", frequency: "Less common", pattern: "No change — 25", theme: "Daily Routines", altPast: ["spat"], altParticiple: ["spat"] },
+      { base: "split", past: "split", participle: "split", translation: "dividir", frequency: "Less common", pattern: "No change — 25", theme: "Creation" },
+      { base: "spoil", past: "spoiled / spoilt", participle: "spoiled / spoilt", translation: "fer malbé", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Daily Routines", altPast: ["spoilt"], altParticiple: ["spoilt"] },
+      { base: "spread", past: "spread", participle: "spread", translation: "estendre", frequency: "Common", pattern: "No change — 25", theme: "Daily Routines" },
+      { base: "spring", past: "sprang", participle: "sprung", translation: "saltar", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Movement" },
+      { base: "stand", past: "stood", participle: "stood", translation: "estar dret", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "steal", past: "stole", participle: "stolen", translation: "robar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "stick", past: "stuck", participle: "stuck", translation: "enganxar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Actions & Impact" },
+      { base: "sting", past: "stung", participle: "stung", translation: "picar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Nature & Forces" },
+      { base: "stink", past: "stank", participle: "stunk", translation: "fer pudor", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces", altParticiple: ["stunk"] },
+      { base: "stride", past: "strode", participle: "stridden", translation: "avançar a grans passes", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
+      { base: "strike", past: "struck", participle: "struck", translation: "colpejar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Actions & Impact", altParticiple: ["stricken"] },
+      { base: "string", past: "strung", participle: "strung", translation: "enfilar", frequency: "Least common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Creation" },
+      { base: "strive", past: "strove", participle: "striven", translation: "esforçar-se", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Emotion & Thought" },
+      { base: "swear", past: "swore", participle: "sworn", translation: "jurar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Communication" },
+      { base: "sweat", past: "sweated / sweat", participle: "sweated / sweat", translation: "suar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Health", altPast: ["sweat"], altParticiple: ["sweat"] },
+      { base: "sweep", past: "swept", participle: "swept", translation: "escombrar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Daily Routines" },
+      { base: "swell", past: "swelled", participle: "swelled / swollen", translation: "inflar-se", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Health", altParticiple: ["swollen"] },
+      { base: "swim", past: "swam", participle: "swum", translation: "nedar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Movement" },
+      { base: "swing", past: "swung", participle: "swung", translation: "balancejar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Movement" },
+      { base: "take", past: "took", participle: "taken", translation: "prendre", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "teach", past: "taught", participle: "taught", translation: "ensenyar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Communication" },
+      { base: "tear", past: "tore", participle: "torn", translation: "esquinçar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "tell", past: "told", participle: "told", translation: "explicar", frequency: "Common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Communication" },
+      { base: "think", past: "thought", participle: "thought", translation: "pensar", frequency: "Common", pattern: "-OUGHT / -AUGHT family — 8", theme: "Emotion & Thought" },
+      { base: "thrive", past: "thrived / throve", participle: "thrived / thriven", translation: "prosperar", frequency: "Least common", pattern: "Regular alternative available (-ed) — 24", theme: "Nature & Forces", altPast: ["throve"], altParticiple: ["thriven"] },
+      { base: "throw", past: "threw", participle: "thrown", translation: "llençar", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Actions & Impact" },
+      { base: "thrust", past: "thrust", participle: "thrust", translation: "clavar", frequency: "Less common", pattern: "No change — 25", theme: "Actions & Impact" },
+      { base: "understand", past: "understood", participle: "understood", translation: "entendre", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Emotion & Thought" },
+      { base: "uphold", past: "upheld", participle: "upheld", translation: "mantenir", frequency: "Least common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "States & Being" },
+      { base: "upset", past: "upset", participle: "upset", translation: "trasbalsar", frequency: "Less common", pattern: "No change — 25", theme: "Emotion & Thought" }
     );
     verbs.push(
-      { base: "wake", past: "woke", participle: "woken", translation: "despertar", level: "Core Classroom", pattern: "Vowel change (a-o)", theme: "Daily Routines" },
-      { base: "wear", past: "wore", participle: "worn", translation: "portar posat", level: "Core Classroom", pattern: "Vowel change + -rn", theme: "Daily Routines" },
-      { base: "weave", past: "wove", participle: "woven", translation: "teixir", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Creation" },
-      { base: "wed", past: "wed", participle: "wed", translation: "casar-se", level: "Extended Practice", pattern: "No change", theme: "Daily Routines", altPast: ["wedded"], altParticiple: ["wedded"] },
-      { base: "weep", past: "wept", participle: "wept", translation: "plorar", level: "Extended Practice", pattern: "Double-e to -ept", theme: "Emotion & Thought" },
-      { base: "win", past: "won", participle: "won", translation: "guanyar", level: "Core Classroom", pattern: "Vowel change (i-o)", theme: "Actions & Impact" },
-      { base: "wind", past: "wound", participle: "wound", translation: "enrotllar", level: "Extended Practice", pattern: "-ind to -ound", theme: "Movement" },
-      { base: "withhold", past: "withheld", participle: "withheld", translation: "retenir", level: "Advanced Mastery", pattern: "-hold pattern", theme: "Transactions" },
-      { base: "withstand", past: "withstood", participle: "withstood", translation: "resistir", level: "Advanced Mastery", pattern: "Vowel change (a-oo)", theme: "Nature & Forces" },
-      { base: "wring", past: "wrung", participle: "wrung", translation: "esprémer", level: "Extended Practice", pattern: "-ing to -ung", theme: "Daily Routines" },
-      { base: "write", past: "wrote", participle: "written", translation: "escriure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Communication" }
+      { base: "wake", past: "woke", participle: "woken", translation: "despertar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Daily Routines" },
+      { base: "wear", past: "wore", participle: "worn", translation: "portar posat", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Daily Routines" },
+      { base: "weave", past: "wove", participle: "woven", translation: "teixir", frequency: "Least common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Creation" },
+      { base: "wed", past: "wed", participle: "wed", translation: "casar-se", frequency: "Less common", pattern: "No change — 25", theme: "Daily Routines", altPast: ["wedded"], altParticiple: ["wedded"] },
+      { base: "weep", past: "wept", participle: "wept", translation: "plorar", frequency: "Less common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Emotion & Thought" },
+      { base: "win", past: "won", participle: "won", translation: "guanyar", frequency: "Common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Actions & Impact" },
+      { base: "wind", past: "wound", participle: "wound", translation: "enrotllar", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Movement" },
+      { base: "withhold", past: "withheld", participle: "withheld", translation: "retenir", frequency: "Least common", pattern: "E→T/D family (-old/-elt/-ept etc.) — 27", theme: "Transactions" },
+      { base: "withstand", past: "withstood", participle: "withstood", translation: "resistir", frequency: "Least common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Nature & Forces" },
+      { base: "wring", past: "wrung", participle: "wrung", translation: "esprémer", frequency: "Less common", pattern: "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16", theme: "Daily Routines" },
+      { base: "write", past: "wrote", participle: "written", translation: "escriure", frequency: "Common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Communication" }
     );
 
     const STORAGE_KEY = "irregularVerbProgress_v1";
     const selectionSet = new Set();
     let activeGroup = null;
-    let currentGrouping = "level";
+    let currentGrouping = "frequency";
     let quizQueue = [];
     let quizHistory = [];
     let quizIndex = 0;
@@ -706,7 +694,6 @@
     const selectionCount = document.getElementById("selectionCount");
     const selectAllBtn = document.getElementById("selectAllBtn");
     const clearSelectionBtn = document.getElementById("clearSelectionBtn");
-    const playSelectionBtn = document.getElementById("playSelectionBtn");
     const quizStatus = document.getElementById("quizStatus");
     const quizResult = document.getElementById("quizResult");
     const quizPane = document.getElementById("quizPane");
@@ -715,7 +702,6 @@
     const skipQuestionBtn = document.getElementById("skipQuestionBtn");
     const questionCountInput = document.getElementById("questionCount");
     const quizModeSelect = document.getElementById("quizMode");
-    const ttsDuringQuiz = document.getElementById("ttsDuringQuiz");
     const startQuizBtn = document.getElementById("startQuizBtn");
     const resetProgressBtn = document.getElementById("resetProgressBtn");
     const totalVerbsEl = document.getElementById("totalVerbs");
@@ -751,6 +737,18 @@
     function renderGroups() {
       const groups = new Map();
       const searchTerm = searchInput.value.trim().toLowerCase();
+      const frequencyOrder = ["Common", "Less common", "Least common"];
+      const patternOrder = [
+        "No change — 25",
+        "Regular alternative available (-ed) — 24",
+        "“-n / -en / -rn / -wn” participle family — 43",
+        "Pure vowel-change (no -n/-en) — 27",
+        "-OUGHT / -AUGHT family — 8",
+        "E→T/D family (-old/-elt/-ept etc.) — 27",
+        "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16",
+        "Consonant/spelling tweaks — 8",
+        "Suppletive / unique — 4"
+      ];
 
       verbs.forEach((verb) => {
         const matchesSearch = !searchTerm ||
@@ -763,14 +761,30 @@
           return;
         }
 
-        const key = currentGrouping === "level" ? verb.level : currentGrouping === "pattern" ? verb.pattern : verb.theme;
+        const key = currentGrouping === "frequency"
+          ? verb.frequency
+          : currentGrouping === "pattern"
+            ? verb.pattern
+            : verb.theme;
         if (!groups.has(key)) {
           groups.set(key, []);
         }
         groups.get(key).push(verb);
       });
 
-      const sortedGroups = Array.from(groups.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      const sortedGroups = Array.from(groups.entries()).sort((a, b) => {
+        if (currentGrouping === "frequency") {
+          const aIndex = frequencyOrder.indexOf(a[0]);
+          const bIndex = frequencyOrder.indexOf(b[0]);
+          return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
+        }
+        if (currentGrouping === "pattern") {
+          const aIndex = patternOrder.indexOf(a[0]);
+          const bIndex = patternOrder.indexOf(b[0]);
+          return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
+        }
+        return a[0].localeCompare(b[0]);
+      });
       groupList.innerHTML = "";
 
       if (!sortedGroups.length) {
@@ -789,7 +803,6 @@
           activeGroup = name;
           renderGroups();
           renderVerbTable(list);
-          speakIfRequested(`${list.length} verbs in group ${name}`);
         });
         card.addEventListener("keypress", (event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -894,20 +907,6 @@
       updateSelectionCount();
     }
 
-    function playSelection() {
-      if (!selectionSet.size) {
-        speakIfRequested("No verbs selected yet.");
-        return;
-      }
-      const list = verbs.filter((verb) => selectionSet.has(verb.base));
-      const sequence = list.flatMap((verb) => [verb.base, verb.past, verb.participle]);
-      let delay = 0;
-      sequence.forEach((word) => {
-        setTimeout(() => speakIfRequested(word), delay);
-        delay += 900;
-      });
-    }
-
     function shuffle(array) {
       const copy = [...array];
       for (let i = copy.length - 1; i > 0; i--) {
@@ -978,7 +977,6 @@
       if (firstInput) {
         firstInput.focus();
       }
-      handleQuizAudio("question");
     }
 
     function createQuestion(verb) {
@@ -1033,22 +1031,6 @@
       quizResult.style.display = "block";
       updateProgressSummary();
       renderHardVerbs();
-      handleQuizAudio("answer", `Great job! ${quizResult.textContent}`);
-    }
-
-    function handleQuizAudio(stage, overrideText) {
-      const mode = ttsDuringQuiz.value;
-      if (mode === "off") return;
-      if (stage === "question" && (mode === "question" || mode === "both")) {
-        if (currentQuestion.type === "forms") {
-          speakIfRequested(`${currentQuestion.verb.base}. Provide the past and past participle.`);
-        } else {
-          speakIfRequested(`Translate into English: ${currentQuestion.verb.translation}`);
-        }
-      }
-      if (stage === "answer" && (mode === "answer" || mode === "both")) {
-        speakIfRequested(overrideText || `${currentQuestion.verb.base}, ${currentQuestion.verb.past}, ${currentQuestion.verb.participle}`);
-      }
     }
 
     quizForm.addEventListener("submit", (event) => {
@@ -1069,7 +1051,6 @@
         quizResult.className = "quiz-result incorrect";
       }
       quizResult.style.display = "block";
-      handleQuizAudio("answer", correct ? `${currentQuestion.verb.base}. Correct.` : `Correct forms: ${feedback.join(", ")}`);
       updateProgressSummary();
       renderHardVerbs();
       setTimeout(() => {
@@ -1087,7 +1068,6 @@
       quizResult.textContent = `Skipped. Correct forms: ${currentQuestion.verb.past} | ${currentQuestion.verb.participle}`;
       quizResult.className = "quiz-result incorrect";
       quizResult.style.display = "block";
-      handleQuizAudio("answer", `Correct forms: ${currentQuestion.verb.past}, ${currentQuestion.verb.participle}`);
       updateProgressSummary();
       renderHardVerbs();
       setTimeout(() => {
@@ -1098,7 +1078,6 @@
 
     selectAllBtn.addEventListener("click", selectAllCurrent);
     clearSelectionBtn.addEventListener("click", clearSelection);
-    playSelectionBtn.addEventListener("click", playSelection);
     verbTable.addEventListener("click", handleTableInteraction);
 
     startQuizBtn.addEventListener("click", () => {
