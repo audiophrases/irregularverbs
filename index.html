@@ -1,1 +1,1234 @@
-hello codex!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Irregular Verb Coach</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      --accent: #2f7de1;
+      --accent-soft: rgba(47, 125, 225, 0.15);
+      --bg-soft: rgba(0, 0, 0, 0.05);
+      --danger: #c0392b;
+      --success: #1e8449;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f2f4f8;
+      color: #111827;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    body.dark {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1d4ed8, #9333ea);
+      color: white;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(17, 24, 39, 0.25);
+    }
+
+    header h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      max-width: 780px;
+      margin: 0 auto;
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    main {
+      margin: -2rem auto 4rem;
+      padding: 0 1rem 4rem;
+      max-width: 1200px;
+    }
+
+    section {
+      background: white;
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    body.dark section {
+      background: #111827;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2 span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .controls-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    select,
+    input[type="number"],
+    button,
+    input[type="search"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.15);
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    body.dark select,
+    body.dark input[type="number"],
+    body.dark button,
+    body.dark input[type="search"] {
+      background: rgba(17, 24, 39, 0.9);
+      color: inherit;
+      border: 1px solid rgba(226, 232, 240, 0.2);
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-weight: 600;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+    }
+
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      box-shadow: none;
+    }
+
+    .group-list {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      margin-top: 1rem;
+    }
+
+    .group-card {
+      border-radius: 14px;
+      padding: 1rem;
+      background: var(--bg-soft);
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    body.dark .group-card {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .group-card:hover,
+    .group-card.active {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
+    }
+
+    .group-card h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .group-card p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    table thead {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    body.dark table thead {
+      background: rgba(59, 130, 246, 0.16);
+    }
+
+    th,
+    td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    tbody tr:hover {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .verb-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stats-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .stats-pill.good {
+      background: var(--success);
+    }
+
+    .stats-pill.bad {
+      background: var(--danger);
+    }
+
+    .stats-pill.neutral {
+      background: #6b7280;
+    }
+
+    .quiz-card {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .quiz-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .quiz-status span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .quiz-result {
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(30, 136, 229, 0.08);
+      font-weight: 600;
+      display: none;
+    }
+
+    .quiz-result.correct {
+      background: rgba(30, 136, 229, 0.18);
+      color: var(--success);
+    }
+
+    .quiz-result.incorrect {
+      background: rgba(192, 57, 43, 0.15);
+      color: var(--danger);
+    }
+
+    .hard-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .hard-card {
+      border-radius: 12px;
+      padding: 1rem;
+      background: rgba(192, 57, 43, 0.12);
+      border: 1px solid rgba(192, 57, 43, 0.25);
+    }
+
+    .empty-state {
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(148, 163, 184, 0.18);
+      text-align: center;
+      font-style: italic;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem 3rem;
+      font-size: 0.9rem;
+      color: #475569;
+    }
+
+    body.dark footer {
+      color: #cbd5f5;
+    }
+
+    .flex {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 768px) {
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Irregular Verb Coach</h1>
+    <p>
+      Master every irregular English verb with tailored study paths, Catalan translations, and smart quizzes. Choose the
+      grouping that fits your ESL lesson, listen to native pronunciation with text-to-speech, and keep track of your
+      learners' toughest verbs with automatic progress recovery.
+    </p>
+  </header>
+
+  <main>
+    <section aria-labelledby="study-controls">
+      <h2 id="study-controls"><span>1</span>Choose how to study</h2>
+      <div class="controls-grid">
+        <div>
+          <label for="groupingSelect">Grouping style</label>
+          <select id="groupingSelect">
+            <option value="level">By classroom difficulty &amp; frequency</option>
+            <option value="pattern">By spelling &amp; sound pattern</option>
+            <option value="theme">By semantic theme</option>
+          </select>
+        </div>
+        <div>
+          <label for="voiceSelect">Voice for text-to-speech</label>
+          <select id="voiceSelect">
+            <option value="">Auto (best available)</option>
+          </select>
+        </div>
+        <div>
+          <label for="searchInput">Quick search</label>
+          <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
+        </div>
+        <div>
+          <label for="darkModeToggle">Display style</label>
+          <button id="darkModeToggle" type="button" class="secondary">Toggle dark mode</button>
+        </div>
+      </div>
+      <div class="group-list" id="groupList" role="list"></div>
+    </section>
+
+    <section aria-labelledby="verb-table">
+      <h2 id="verb-table"><span>2</span>Explore the verbs</h2>
+      <p>
+        Select verbs to include in your quiz, play the pronunciation, and keep an eye on the accuracy color-coding.
+        Green indicates a strong verb, gray is neutral, and red signals a verb to review soon.
+      </p>
+      <div class="flex" style="justify-content: space-between;">
+        <div class="flex">
+          <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
+          <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
+        </div>
+        <div class="flex" style="font-weight: 600;">
+          <span>Selected for quiz: <span id="selectionCount">0</span></span>
+          <button type="button" id="playSelectionBtn">Play selected verbs</button>
+        </div>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col"><span class="sr-only">Select for quiz</span></th>
+              <th scope="col">Base</th>
+              <th scope="col">Past</th>
+              <th scope="col">Past Participle</th>
+              <th scope="col">Catalan</th>
+              <th scope="col">Pattern</th>
+              <th scope="col">Theme</th>
+              <th scope="col">Progress</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="verbTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="quiz-section">
+      <h2 id="quiz-section"><span>3</span>Practice &amp; quiz</h2>
+      <div class="quiz-card">
+        <div class="controls-grid">
+          <div>
+            <label for="questionCount">Number of questions</label>
+            <input type="number" id="questionCount" min="3" max="50" value="10" />
+          </div>
+          <div>
+            <label for="quizMode">Quiz focus</label>
+            <select id="quizMode">
+              <option value="mixed">Mix of forms &amp; translations</option>
+              <option value="forms">English forms only</option>
+              <option value="translation">Catalan to English</option>
+            </select>
+          </div>
+          <div>
+            <label for="ttsDuringQuiz">Audio support</label>
+            <select id="ttsDuringQuiz">
+              <option value="off">Silent</option>
+              <option value="question">Play question</option>
+              <option value="answer">Play correct answer</option>
+              <option value="both">Play question &amp; answer</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex" style="justify-content: space-between;">
+          <button type="button" id="startQuizBtn">Start quiz with selected verbs</button>
+          <button type="button" class="secondary" id="resetProgressBtn">Reset saved progress</button>
+        </div>
+        <div class="quiz-status" id="quizStatus" aria-live="polite"></div>
+        <div class="quiz-result" id="quizResult" role="alert"></div>
+        <div id="quizPane" style="display: none;">
+          <h3 id="quizPrompt"></h3>
+          <form id="quizForm"></form>
+          <div class="flex">
+            <button type="submit" form="quizForm">Check answer</button>
+            <button type="button" class="secondary" id="skipQuestionBtn">Skip</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="progress-section">
+      <h2 id="progress-section"><span>4</span>Progress &amp; review</h2>
+      <div class="controls-grid">
+        <div>
+          <label>Total verbs in curriculum</label>
+          <div id="totalVerbs">0</div>
+        </div>
+        <div>
+          <label>Studied verbs</label>
+          <div id="studiedVerbs">0</div>
+        </div>
+        <div>
+          <label>Average accuracy</label>
+          <div id="averageAccuracy">0%</div>
+        </div>
+        <div>
+          <label>Last review session</label>
+          <div id="lastReviewed">—</div>
+        </div>
+      </div>
+      <h3>Hard verbs to review</h3>
+      <div id="hardVerbs" class="hard-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    Built for ESL classrooms: American spelling for reference, British answers accepted, Catalan translations included.
+    Your progress stays on this device.
+  </footer>
+
+  <script>
+    const verbs = [
+      { base: "arise", past: "arose", participle: "arisen", translation: "sorgir; aixecar-se", level: "Advanced Mastery", pattern: "Vowel switch (i-o-e)", theme: "Nature & Forces" },
+      { base: "awake", past: "awoke", participle: "awoken", translation: "despertar-se", level: "Extended Practice", pattern: "Vowel switch (a-o)", theme: "Daily Routines" },
+      { base: "be", past: "was / were", participle: "been", translation: "ser; estar", level: "Core Classroom", pattern: "Unique forms", theme: "States & Being" },
+      { base: "bear", past: "bore", participle: "borne", translation: "suportar; donar a llum", level: "Advanced Mastery", pattern: "Vowel change (ea-o-o)", theme: "Nature & Forces" },
+      { base: "beat", past: "beat", participle: "beaten", translation: "colpejar; vèncer", level: "Extended Practice", pattern: "No change + -en", theme: "Actions & Impact" },
+      { base: "become", past: "became", participle: "become", translation: "esdevenir", level: "Core Classroom", pattern: "Vowel change (e-a-o)", theme: "States & Being" },
+      { base: "befall", past: "befell", participle: "befallen", translation: "succeir", level: "Advanced Mastery", pattern: "Vowel change (a-e-a)", theme: "Nature & Forces" },
+      { base: "begin", past: "began", participle: "begun", translation: "començar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Daily Routines" },
+      { base: "behold", past: "beheld", participle: "beheld", translation: "contemplar", level: "Advanced Mastery", pattern: "-old pattern", theme: "Perception" },
+      { base: "bend", past: "bent", participle: "bent", translation: "corbar", level: "Extended Practice", pattern: "-end to -ent", theme: "Actions & Impact" },
+      { base: "bereave", past: "bereaved", participle: "bereaved", translation: "privar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Emotion & Thought", altPast: ["bereft"], altParticiple: ["bereft"] },
+      { base: "beseech", past: "besought", participle: "besought", translation: "suplicar", level: "Advanced Mastery", pattern: "-ought/-aught", theme: "Communication" },
+      { base: "beset", past: "beset", participle: "beset", translation: "assetjar", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
+      { base: "bet", past: "bet", participle: "bet", translation: "apostar", level: "Core Classroom", pattern: "No change", theme: "Transactions" },
+      { base: "bid", past: "bid", participle: "bid", translation: "oferir; licitar", level: "Extended Practice", pattern: "No change", theme: "Transactions" },
+      { base: "bind", past: "bound", participle: "bound", translation: "lligar", level: "Extended Practice", pattern: "-ind to -ound", theme: "Actions & Impact" },
+      { base: "bite", past: "bit", participle: "bitten", translation: "mossegar", level: "Extended Practice", pattern: "Vowel change (i-i-e)", theme: "Nature & Forces" },
+      { base: "bleed", past: "bled", participle: "bled", translation: "sagnar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Health" },
+      { base: "blow", past: "blew", participle: "blown", translation: "bufar", level: "Extended Practice", pattern: "Vowel change (ow-ew-own)", theme: "Nature & Forces" },
+      { base: "break", past: "broke", participle: "broken", translation: "trencar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "breed", past: "bred", participle: "bred", translation: "criar", level: "Advanced Mastery", pattern: "Double-e to -ed", theme: "Nature & Forces" },
+      { base: "bring", past: "brought", participle: "brought", translation: "portar", level: "Core Classroom", pattern: "-ing to -ought", theme: "Movement" },
+      { base: "broadcast", past: "broadcast", participle: "broadcast", translation: "emetre", level: "Extended Practice", pattern: "No change", theme: "Communication" },
+      { base: "build", past: "built", participle: "built", translation: "construir", level: "Core Classroom", pattern: "-ild to -ilt", theme: "Creation" },
+      { base: "burn", past: "burned", participle: "burned", translation: "cremar", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["burnt"], altParticiple: ["burnt"] },
+      { base: "burst", past: "burst", participle: "burst", translation: "esclatar", level: "Extended Practice", pattern: "No change", theme: "Nature & Forces" },
+      { base: "buy", past: "bought", participle: "bought", translation: "comprar", level: "Core Classroom", pattern: "-uy to -ought", theme: "Transactions" },
+      { base: "cast", past: "cast", participle: "cast", translation: "llençar", level: "Extended Practice", pattern: "No change", theme: "Creation" },
+      { base: "catch", past: "caught", participle: "caught", translation: "agafar", level: "Core Classroom", pattern: "-atch to -aught", theme: "Movement" },
+      { base: "chide", past: "chided", participle: "chided", translation: "renyar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Communication", altPast: ["chid"], altParticiple: ["chidden"] },
+      { base: "choose", past: "chose", participle: "chosen", translation: "triar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Decisions" },
+      { base: "cling", past: "clung", participle: "clung", translation: "aferrar-se", level: "Extended Practice", pattern: "-ing to -ung", theme: "Emotion & Thought" },
+      { base: "clothe", past: "clothed", participle: "clothed", translation: "vestir", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["clad"], altParticiple: ["clad"] },
+      { base: "come", past: "came", participle: "come", translation: "venir", level: "Core Classroom", pattern: "Vowel change (o-a-o)", theme: "Movement" },
+      { base: "cost", past: "cost", participle: "cost", translation: "costar", level: "Core Classroom", pattern: "No change", theme: "Transactions" },
+      { base: "creep", past: "crept", participle: "crept", translation: "arrossegar-se", level: "Extended Practice", pattern: "Double-e to -ept", theme: "Movement" },
+      { base: "cut", past: "cut", participle: "cut", translation: "tallar", level: "Core Classroom", pattern: "No change", theme: "Creation" },
+      { base: "deal", past: "dealt", participle: "dealt", translation: "negociar; repartir", level: "Extended Practice", pattern: "-eal to -ealt", theme: "Transactions" },
+      { base: "dig", past: "dug", participle: "dug", translation: "cavar", level: "Extended Practice", pattern: "Short vowel + g", theme: "Nature & Forces" },
+      { base: "do", past: "did", participle: "done", translation: "fer", level: "Core Classroom", pattern: "Unique forms", theme: "Daily Routines" },
+      { base: "draw", past: "drew", participle: "drawn", translation: "dibuixar; estirar", level: "Extended Practice", pattern: "Vowel change (aw-ew-awn)", theme: "Creation" },
+      { base: "dream", past: "dreamed", participle: "dreamed", translation: "somiar", level: "Core Classroom", pattern: "Regular alt", theme: "Emotion & Thought", altPast: ["dreamt"], altParticiple: ["dreamt"] },
+      { base: "drink", past: "drank", participle: "drunk", translation: "beure", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Daily Routines" },
+      { base: "dive", past: "dived", participle: "dived", translation: "capbussar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["dove"], altParticiple: ["dove"] },
+      { base: "drive", past: "drove", participle: "driven", translation: "conduir", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Movement" },
+      { base: "dwell", past: "dwelled", participle: "dwelled", translation: "residir", level: "Advanced Mastery", pattern: "Regular alt", theme: "Daily Routines", altPast: ["dwelt"], altParticiple: ["dwelt"] },
+      { base: "eat", past: "ate", participle: "eaten", translation: "menjar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Daily Routines" },
+      { base: "fall", past: "fell", participle: "fallen", translation: "caure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Movement" },
+      { base: "feed", past: "fed", participle: "fed", translation: "alimentar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Daily Routines" },
+      { base: "feel", past: "felt", participle: "felt", translation: "sentir", level: "Core Classroom", pattern: "Double-e to -elt", theme: "Emotion & Thought" },
+      { base: "fight", past: "fought", participle: "fought", translation: "lluitar", level: "Core Classroom", pattern: "-ight to -ought", theme: "Actions & Impact" },
+      { base: "find", past: "found", participle: "found", translation: "trobar", level: "Core Classroom", pattern: "-ind to -ound", theme: "Decisions" },
+      { base: "flee", past: "fled", participle: "fled", translation: "fugir", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Movement" },
+      { base: "fling", past: "flung", participle: "flung", translation: "llençar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Actions & Impact" },
+      { base: "fly", past: "flew", participle: "flown", translation: "volar", level: "Core Classroom", pattern: "Vowel change (y-ew-own)", theme: "Movement" },
+      { base: "forbid", past: "forbade", participle: "forbidden", translation: "prohibir", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Communication" }
+    ];
+    verbs.push(
+      { base: "forget", past: "forgot", participle: "forgotten", translation: "oblidar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
+      { base: "forgive", past: "forgave", participle: "forgiven", translation: "perdonar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
+      { base: "forsake", past: "forsook", participle: "forsaken", translation: "abandonar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
+      { base: "freeze", past: "froze", participle: "frozen", translation: "gelar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Nature & Forces" },
+      { base: "get", past: "got", participle: "gotten", translation: "aconseguir", level: "Core Classroom", pattern: "Irregular + -en", theme: "Transactions", altParticiple: ["got"] },
+      { base: "give", past: "gave", participle: "given", translation: "donar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Transactions" },
+      { base: "go", past: "went", participle: "gone", translation: "anar", level: "Core Classroom", pattern: "Suppletive", theme: "Movement" },
+      { base: "grind", past: "ground", participle: "ground", translation: "moldre", level: "Advanced Mastery", pattern: "-ind to -ound", theme: "Creation" },
+      { base: "grow", past: "grew", participle: "grown", translation: "créixer", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Nature & Forces" },
+      { base: "hang", past: "hanged", participle: "hanged", translation: "penjar", level: "Extended Practice", pattern: "Regular alt", theme: "Actions & Impact", altPast: ["hung"], altParticiple: ["hung"] },
+      { base: "have", past: "had", participle: "had", translation: "tenir", level: "Core Classroom", pattern: "Irregular consonant change", theme: "States & Being" },
+      { base: "hear", past: "heard", participle: "heard", translation: "sentir", level: "Core Classroom", pattern: "-ear to -eard", theme: "Perception" },
+      { base: "hide", past: "hid", participle: "hidden", translation: "amagar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "hit", past: "hit", participle: "hit", translation: "copar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
+      { base: "hold", past: "held", participle: "held", translation: "subjectar", level: "Core Classroom", pattern: "-old pattern", theme: "Actions & Impact" },
+      { base: "hurt", past: "hurt", participle: "hurt", translation: "fer mal", level: "Core Classroom", pattern: "No change", theme: "Health" },
+      { base: "keep", past: "kept", participle: "kept", translation: "mantenir", level: "Core Classroom", pattern: "Double-e to -ept", theme: "States & Being" },
+      { base: "kneel", past: "kneeled", participle: "kneeled", translation: "agenollar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["knelt"], altParticiple: ["knelt"] },
+      { base: "knit", past: "knitted", participle: "knitted", translation: "teixir", level: "Advanced Mastery", pattern: "Regular alt", theme: "Creation", altPast: ["knit"], altParticiple: ["knit"] },
+      { base: "know", past: "knew", participle: "known", translation: "saber; conèixer", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Emotion & Thought" },
+      { base: "lay", past: "laid", participle: "laid", translation: "posar", level: "Extended Practice", pattern: "-ay to -aid", theme: "Actions & Impact" },
+      { base: "lead", past: "led", participle: "led", translation: "guiar", level: "Core Classroom", pattern: "Vowel reduction", theme: "Actions & Impact" },
+      { base: "lean", past: "leaned", participle: "leaned", translation: "inclinar-se", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["leant"], altParticiple: ["leant"] },
+      { base: "leap", past: "leaped", participle: "leaped", translation: "saltar", level: "Extended Practice", pattern: "Regular alt", theme: "Movement", altPast: ["leapt"], altParticiple: ["leapt"] },
+      { base: "leave", past: "left", participle: "left", translation: "marxar", level: "Core Classroom", pattern: "-eave to -eft", theme: "Movement" },
+      { base: "lend", past: "lent", participle: "lent", translation: "prestar", level: "Core Classroom", pattern: "-end to -ent", theme: "Transactions" },
+      { base: "let", past: "let", participle: "let", translation: "deixar", level: "Core Classroom", pattern: "No change", theme: "Communication" },
+      { base: "lie", past: "lay", participle: "lain", translation: "estirar-se", level: "Extended Practice", pattern: "Vowel change + -n", theme: "Daily Routines" },
+      { base: "light", past: "lighted", participle: "lighted", translation: "encendre", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["lit"], altParticiple: ["lit"] },
+      { base: "lose", past: "lost", participle: "lost", translation: "perdre", level: "Core Classroom", pattern: "Consonant swap", theme: "Emotion & Thought" },
+      { base: "learn", past: "learned", participle: "learned", translation: "aprendre", level: "Core Classroom", pattern: "Regular alt", theme: "Daily Routines", altPast: ["learnt"], altParticiple: ["learnt"] },
+      { base: "make", past: "made", participle: "made", translation: "fer", level: "Core Classroom", pattern: "Consonant swap", theme: "Creation" },
+      { base: "mean", past: "meant", participle: "meant", translation: "significar", level: "Core Classroom", pattern: "-ean to -eant", theme: "Communication" },
+      { base: "meet", past: "met", participle: "met", translation: "trobar-se", level: "Core Classroom", pattern: "Double-e to -et", theme: "Communication" },
+      { base: "mislay", past: "mislaid", participle: "mislaid", translation: "desaparèixer (temporalment)", level: "Advanced Mastery", pattern: "-ay to -aid", theme: "Daily Routines" },
+      { base: "mistake", past: "mistook", participle: "mistaken", translation: "equivocar-se", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
+      { base: "misunderstand", past: "misunderstood", participle: "misunderstood", translation: "malentendre", level: "Extended Practice", pattern: "Vowel change (oo)", theme: "Communication" },
+      { base: "overcome", past: "overcame", participle: "overcome", translation: "superar", level: "Extended Practice", pattern: "Vowel change (o-a-o)", theme: "Emotion & Thought" },
+      { base: "overdo", past: "overdid", participle: "overdone", translation: "exagerar", level: "Advanced Mastery", pattern: "Unique forms", theme: "Emotion & Thought" },
+      { base: "overhear", past: "overheard", participle: "overheard", translation: "sentir sense voler", level: "Extended Practice", pattern: "-ear to -eard", theme: "Perception" },
+      { base: "overtake", past: "overtook", participle: "overtaken", translation: "avançar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Movement" },
+      { base: "partake", past: "partook", participle: "partaken", translation: "participar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Daily Routines" },
+      { base: "pay", past: "paid", participle: "paid", translation: "pagar", level: "Core Classroom", pattern: "-ay to -aid", theme: "Transactions" },
+      { base: "plead", past: "pleaded", participle: "pleaded", translation: "suplicar", level: "Extended Practice", pattern: "Regular alt", theme: "Communication", altPast: ["pled"], altParticiple: ["pled"] },
+      { base: "prove", past: "proved", participle: "proved", translation: "demostrar", level: "Extended Practice", pattern: "Regular alt", theme: "Communication", altParticiple: ["proven"] },
+      { base: "put", past: "put", participle: "put", translation: "posar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
+      { base: "quit", past: "quit", participle: "quit", translation: "deixar", level: "Extended Practice", pattern: "No change", theme: "Daily Routines" },
+      { base: "read", past: "read", participle: "read", translation: "llegir", level: "Core Classroom", pattern: "No change (pronunciation shift)", theme: "Communication" },
+      { base: "rid", past: "rid", participle: "rid", translation: "lliurar-se", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
+      { base: "ride", past: "rode", participle: "ridden", translation: "muntar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Movement" },
+      { base: "ring", past: "rang", participle: "rung", translation: "tocar (campana)", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Communication" },
+      { base: "rise", past: "rose", participle: "risen", translation: "elevar-se", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Nature & Forces" },
+      { base: "run", past: "ran", participle: "run", translation: "córrer", level: "Core Classroom", pattern: "Vowel change (u-a-u)", theme: "Movement" }
+    );
+    verbs.push(
+      { base: "say", past: "said", participle: "said", translation: "dir", level: "Core Classroom", pattern: "Consonant swap", theme: "Communication" },
+      { base: "see", past: "saw", participle: "seen", translation: "veure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Perception" },
+      { base: "seek", past: "sought", participle: "sought", translation: "cercar", level: "Extended Practice", pattern: "-eek to -ought", theme: "Decisions" },
+      { base: "sell", past: "sold", participle: "sold", translation: "vendre", level: "Core Classroom", pattern: "-ell to -old", theme: "Transactions" },
+      { base: "send", past: "sent", participle: "sent", translation: "enviar", level: "Core Classroom", pattern: "-end to -ent", theme: "Communication" },
+      { base: "set", past: "set", participle: "set", translation: "col·locar", level: "Core Classroom", pattern: "No change", theme: "Actions & Impact" },
+      { base: "sew", past: "sewed", participle: "sewn", translation: "cosir", level: "Extended Practice", pattern: "Irregular -n", theme: "Creation", altParticiple: ["sewed"] },
+      { base: "shake", past: "shook", participle: "shaken", translation: "sacsejar", level: "Extended Practice", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "shave", past: "shaved", participle: "shaved", translation: "afaitar", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altParticiple: ["shaven"] },
+      { base: "shear", past: "sheared", participle: "shorn", translation: "tallar (llana)", level: "Advanced Mastery", pattern: "Irregular -orn", theme: "Nature & Forces" },
+      { base: "shed", past: "shed", participle: "shed", translation: "perdre; vessar", level: "Extended Practice", pattern: "No change", theme: "Nature & Forces" },
+      { base: "shine", past: "shined", participle: "shined", translation: "brillar", level: "Extended Practice", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["shone"], altParticiple: ["shone"] },
+      { base: "shoot", past: "shot", participle: "shot", translation: "disparar", level: "Extended Practice", pattern: "Vowel shortening", theme: "Actions & Impact" },
+      { base: "show", past: "showed", participle: "shown", translation: "mostrar", level: "Core Classroom", pattern: "Irregular -n", theme: "Communication", altParticiple: ["showed"] },
+      { base: "shrink", past: "shrank", participle: "shrunk", translation: "encongir-se", level: "Advanced Mastery", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["shrunken"] },
+      { base: "shut", past: "shut", participle: "shut", translation: "tancar", level: "Core Classroom", pattern: "No change", theme: "Daily Routines" },
+      { base: "sing", past: "sang", participle: "sung", translation: "cantar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Communication" },
+      { base: "sink", past: "sank", participle: "sunk", translation: "enfonsar", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["sunken"] },
+      { base: "sit", past: "sat", participle: "sat", translation: "seure", level: "Core Classroom", pattern: "Vowel shortening", theme: "Daily Routines" },
+      { base: "slay", past: "slew", participle: "slain", translation: "matar", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "sleep", past: "slept", participle: "slept", translation: "dormir", level: "Core Classroom", pattern: "Double-e to -ept", theme: "Daily Routines" },
+      { base: "slide", past: "slid", participle: "slid", translation: "lliscar", level: "Extended Practice", pattern: "Silent-e drop", theme: "Movement" },
+      { base: "sling", past: "slung", participle: "slung", translation: "llançar", level: "Advanced Mastery", pattern: "-ing to -ung", theme: "Actions & Impact" },
+      { base: "slit", past: "slit", participle: "slit", translation: "esqueixar", level: "Advanced Mastery", pattern: "No change", theme: "Actions & Impact" },
+      { base: "smell", past: "smelled", participle: "smelled", translation: "olorar", level: "Core Classroom", pattern: "Regular alt", theme: "Perception", altPast: ["smelt"], altParticiple: ["smelt"] },
+      { base: "sow", past: "sowed", participle: "sown", translation: "sembrar", level: "Advanced Mastery", pattern: "Irregular -n", theme: "Nature & Forces", altParticiple: ["sowed"] },
+      { base: "speak", past: "spoke", participle: "spoken", translation: "parlar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Communication" },
+      { base: "speed", past: "sped", participle: "sped", translation: "accelerar", level: "Extended Practice", pattern: "Double-e to -ed", theme: "Movement" },
+      { base: "spell", past: "spelled", participle: "spelled", translation: "lletrejar", level: "Core Classroom", pattern: "Regular alt", theme: "Communication", altPast: ["spelt"], altParticiple: ["spelt"] },
+      { base: "spend", past: "spent", participle: "spent", translation: "gastar", level: "Core Classroom", pattern: "-end to -ent", theme: "Transactions" },
+      { base: "spin", past: "spun", participle: "spun", translation: "girar", level: "Extended Practice", pattern: "Short vowel + -un", theme: "Movement" },
+      { base: "spit", past: "spit", participle: "spit", translation: "escopir", level: "Extended Practice", pattern: "No change", theme: "Daily Routines", altPast: ["spat"], altParticiple: ["spat"] },
+      { base: "split", past: "split", participle: "split", translation: "dividir", level: "Extended Practice", pattern: "No change", theme: "Creation" },
+      { base: "spoil", past: "spoiled", participle: "spoiled", translation: "fer malbé", level: "Extended Practice", pattern: "Regular alt", theme: "Daily Routines", altPast: ["spoilt"], altParticiple: ["spoilt"] },
+      { base: "spread", past: "spread", participle: "spread", translation: "estendre", level: "Core Classroom", pattern: "No change", theme: "Daily Routines" },
+      { base: "spring", past: "sprang", participle: "sprung", translation: "saltar", level: "Advanced Mastery", pattern: "Vowel change (i-a-u)", theme: "Movement" },
+      { base: "stand", past: "stood", participle: "stood", translation: "estar dret", level: "Core Classroom", pattern: "Vowel change (a-oo)", theme: "Daily Routines" },
+      { base: "steal", past: "stole", participle: "stolen", translation: "robar", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "stick", past: "stuck", participle: "stuck", translation: "enganxar", level: "Extended Practice", pattern: "-ick to -uck", theme: "Actions & Impact" },
+      { base: "sting", past: "stung", participle: "stung", translation: "picar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Nature & Forces" },
+      { base: "stink", past: "stank", participle: "stunk", translation: "fer pudor", level: "Extended Practice", pattern: "Vowel change (i-a-u)", theme: "Nature & Forces", altParticiple: ["stunk"] },
+      { base: "stride", past: "strode", participle: "stridden", translation: "avançar a grans passes", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Movement" },
+      { base: "strike", past: "struck", participle: "struck", translation: "colpejar", level: "Extended Practice", pattern: "-ike to -uck", theme: "Actions & Impact", altParticiple: ["stricken"] },
+      { base: "string", past: "strung", participle: "strung", translation: "enfilar", level: "Advanced Mastery", pattern: "-ing to -ung", theme: "Creation" },
+      { base: "strive", past: "strove", participle: "striven", translation: "esforçar-se", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Emotion & Thought" },
+      { base: "swear", past: "swore", participle: "sworn", translation: "jurar", level: "Extended Practice", pattern: "Vowel change + -rn", theme: "Communication" },
+      { base: "sweat", past: "sweated", participle: "sweated", translation: "suar", level: "Extended Practice", pattern: "Regular alt", theme: "Health", altPast: ["sweat"], altParticiple: ["sweat"] },
+      { base: "sweep", past: "swept", participle: "swept", translation: "escombrar", level: "Core Classroom", pattern: "Double-e to -ept", theme: "Daily Routines" },
+      { base: "swell", past: "swelled", participle: "swelled", translation: "inflar-se", level: "Advanced Mastery", pattern: "Regular alt", theme: "Health", altParticiple: ["swollen"] },
+      { base: "swim", past: "swam", participle: "swum", translation: "nedar", level: "Core Classroom", pattern: "Vowel change (i-a-u)", theme: "Movement" },
+      { base: "swing", past: "swung", participle: "swung", translation: "balancejar", level: "Extended Practice", pattern: "-ing to -ung", theme: "Movement" },
+      { base: "take", past: "took", participle: "taken", translation: "prendre", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Actions & Impact" },
+      { base: "teach", past: "taught", participle: "taught", translation: "ensenyar", level: "Core Classroom", pattern: "-each to -aught", theme: "Communication" },
+      { base: "tear", past: "tore", participle: "torn", translation: "esquinçar", level: "Extended Practice", pattern: "Vowel change + -rn", theme: "Actions & Impact" },
+      { base: "tell", past: "told", participle: "told", translation: "explicar", level: "Core Classroom", pattern: "-ell to -old", theme: "Communication" },
+      { base: "think", past: "thought", participle: "thought", translation: "pensar", level: "Core Classroom", pattern: "-ink to -ought", theme: "Emotion & Thought" },
+      { base: "thrive", past: "thrived", participle: "thrived", translation: "prosperar", level: "Advanced Mastery", pattern: "Regular alt", theme: "Nature & Forces", altPast: ["throve"], altParticiple: ["thriven"] },
+      { base: "throw", past: "threw", participle: "thrown", translation: "llençar", level: "Core Classroom", pattern: "Vowel change (ow-ew-own)", theme: "Actions & Impact" },
+      { base: "thrust", past: "thrust", participle: "thrust", translation: "clavar", level: "Extended Practice", pattern: "No change", theme: "Actions & Impact" },
+      { base: "understand", past: "understood", participle: "understood", translation: "entendre", level: "Core Classroom", pattern: "Vowel change (oo)", theme: "Emotion & Thought" },
+      { base: "uphold", past: "upheld", participle: "upheld", translation: "mantenir", level: "Advanced Mastery", pattern: "-hold pattern", theme: "States & Being" },
+      { base: "upset", past: "upset", participle: "upset", translation: "trasbalsar", level: "Extended Practice", pattern: "No change", theme: "Emotion & Thought" }
+    );
+    verbs.push(
+      { base: "wake", past: "woke", participle: "woken", translation: "despertar", level: "Core Classroom", pattern: "Vowel change (a-o)", theme: "Daily Routines" },
+      { base: "wear", past: "wore", participle: "worn", translation: "portar posat", level: "Core Classroom", pattern: "Vowel change + -rn", theme: "Daily Routines" },
+      { base: "weave", past: "wove", participle: "woven", translation: "teixir", level: "Advanced Mastery", pattern: "Vowel change + -en", theme: "Creation" },
+      { base: "wed", past: "wed", participle: "wed", translation: "casar-se", level: "Extended Practice", pattern: "No change", theme: "Daily Routines", altPast: ["wedded"], altParticiple: ["wedded"] },
+      { base: "weep", past: "wept", participle: "wept", translation: "plorar", level: "Extended Practice", pattern: "Double-e to -ept", theme: "Emotion & Thought" },
+      { base: "win", past: "won", participle: "won", translation: "guanyar", level: "Core Classroom", pattern: "Vowel change (i-o)", theme: "Actions & Impact" },
+      { base: "wind", past: "wound", participle: "wound", translation: "enrotllar", level: "Extended Practice", pattern: "-ind to -ound", theme: "Movement" },
+      { base: "withhold", past: "withheld", participle: "withheld", translation: "retenir", level: "Advanced Mastery", pattern: "-hold pattern", theme: "Transactions" },
+      { base: "withstand", past: "withstood", participle: "withstood", translation: "resistir", level: "Advanced Mastery", pattern: "Vowel change (a-oo)", theme: "Nature & Forces" },
+      { base: "wring", past: "wrung", participle: "wrung", translation: "esprémer", level: "Extended Practice", pattern: "-ing to -ung", theme: "Daily Routines" },
+      { base: "write", past: "wrote", participle: "written", translation: "escriure", level: "Core Classroom", pattern: "Vowel change + -en", theme: "Communication" }
+    );
+
+    const STORAGE_KEY = "irregularVerbProgress_v1";
+    const selectionSet = new Set();
+    let activeGroup = null;
+    let currentGrouping = "level";
+    let quizQueue = [];
+    let quizHistory = [];
+    let quizIndex = 0;
+    let currentQuestion = null;
+    let voices = [];
+
+    const voiceSelect = document.getElementById("voiceSelect");
+    const groupList = document.getElementById("groupList");
+    const verbTable = document.getElementById("verbTable");
+    const searchInput = document.getElementById("searchInput");
+    const selectionCount = document.getElementById("selectionCount");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const clearSelectionBtn = document.getElementById("clearSelectionBtn");
+    const playSelectionBtn = document.getElementById("playSelectionBtn");
+    const quizStatus = document.getElementById("quizStatus");
+    const quizResult = document.getElementById("quizResult");
+    const quizPane = document.getElementById("quizPane");
+    const quizPrompt = document.getElementById("quizPrompt");
+    const quizForm = document.getElementById("quizForm");
+    const skipQuestionBtn = document.getElementById("skipQuestionBtn");
+    const questionCountInput = document.getElementById("questionCount");
+    const quizModeSelect = document.getElementById("quizMode");
+    const ttsDuringQuiz = document.getElementById("ttsDuringQuiz");
+    const startQuizBtn = document.getElementById("startQuizBtn");
+    const resetProgressBtn = document.getElementById("resetProgressBtn");
+    const totalVerbsEl = document.getElementById("totalVerbs");
+    const studiedVerbsEl = document.getElementById("studiedVerbs");
+    const averageAccuracyEl = document.getElementById("averageAccuracy");
+    const lastReviewedEl = document.getElementById("lastReviewed");
+    const hardVerbsEl = document.getElementById("hardVerbs");
+    const groupingSelect = document.getElementById("groupingSelect");
+    const darkModeToggle = document.getElementById("darkModeToggle");
+
+    const progress = loadProgress();
+    totalVerbsEl.textContent = verbs.length;
+
+    function loadProgress() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return {};
+        return JSON.parse(saved);
+      } catch (error) {
+        console.error("Unable to load progress", error);
+        return {};
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    function formatPercent(value) {
+      return `${Math.round(value * 100)}%`;
+    }
+
+    function renderGroups() {
+      const groups = new Map();
+      const searchTerm = searchInput.value.trim().toLowerCase();
+
+      verbs.forEach((verb) => {
+        const matchesSearch = !searchTerm ||
+          verb.base.toLowerCase().includes(searchTerm) ||
+          verb.translation.toLowerCase().includes(searchTerm) ||
+          verb.past.toLowerCase().includes(searchTerm) ||
+          verb.participle.toLowerCase().includes(searchTerm);
+
+        if (!matchesSearch) {
+          return;
+        }
+
+        const key = currentGrouping === "level" ? verb.level : currentGrouping === "pattern" ? verb.pattern : verb.theme;
+        if (!groups.has(key)) {
+          groups.set(key, []);
+        }
+        groups.get(key).push(verb);
+      });
+
+      const sortedGroups = Array.from(groups.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+      groupList.innerHTML = "";
+
+      if (!sortedGroups.length) {
+        groupList.innerHTML = '<div class="empty-state">No verbs match your search.</div>';
+        renderVerbTable([]);
+        return;
+      }
+
+      sortedGroups.forEach(([name, list]) => {
+        const card = document.createElement("article");
+        card.className = "group-card" + (activeGroup === name ? " active" : "");
+        card.tabIndex = 0;
+        card.setAttribute("role", "listitem");
+        card.innerHTML = `<h3>${name}</h3><p>${list.length} verb${list.length === 1 ? "" : "s"}</p>`;
+        card.addEventListener("click", () => {
+          activeGroup = name;
+          renderGroups();
+          renderVerbTable(list);
+          speakIfRequested(`${list.length} verbs in group ${name}`);
+        });
+        card.addEventListener("keypress", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            card.click();
+          }
+        });
+        groupList.appendChild(card);
+      });
+
+      if (!activeGroup && sortedGroups.length) {
+        activeGroup = sortedGroups[0][0];
+        renderVerbTable(sortedGroups[0][1]);
+      }
+    }
+
+    function renderVerbTable(list) {
+      const fragment = document.createDocumentFragment();
+      list.forEach((verb) => {
+        const row = document.createElement("tr");
+        const entryKey = verb.base.toLowerCase();
+        const stats = progress[entryKey] || { correct: 0, incorrect: 0 };
+        const total = stats.correct + stats.incorrect;
+        const accuracy = total ? stats.correct / total : 0;
+        let statsClass = "neutral";
+        if (total && accuracy >= 0.75) statsClass = "good";
+        else if (total && accuracy < 0.6) statsClass = "bad";
+
+        row.innerHTML = `
+          <td><input type="checkbox" data-verb="${verb.base}" ${selectionSet.has(verb.base) ? "checked" : ""}></td>
+          <td>${verb.base}</td>
+          <td>${verb.past}</td>
+          <td>${verb.participle}</td>
+          <td>${verb.translation}</td>
+          <td>${verb.pattern}</td>
+          <td>${verb.theme}</td>
+          <td><span class="stats-pill ${statsClass}">${total ? `${Math.round(accuracy * 100)}%` : "New"}</span></td>
+          <td class="verb-actions">
+            <button type="button" data-tts="${verb.base}" data-verb="${verb.base}">🔊 Base</button>
+            <button type="button" data-tts="${verb.past}" data-verb="${verb.base}">🔊 Past</button>
+            <button type="button" data-tts="${verb.participle}" data-verb="${verb.base}">🔊 Participle</button>
+          </td>
+        `;
+        fragment.appendChild(row);
+      });
+      verbTable.innerHTML = "";
+      verbTable.appendChild(fragment);
+      updateSelectionCount();
+    }
+
+    function updateSelectionCount() {
+      selectionCount.textContent = selectionSet.size;
+    }
+
+    function speakIfRequested(text) {
+      if (!text) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      const selectedId = voiceSelect.value;
+      if (selectedId) {
+        const voice = voices.find((v) => v.voiceURI === selectedId);
+        if (voice) {
+          utterance.voice = voice;
+        }
+      }
+      utterance.rate = 0.95;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function handleTableInteraction(event) {
+      const checkbox = event.target.closest('input[type="checkbox"]');
+      if (checkbox) {
+        const verb = checkbox.dataset.verb;
+        if (checkbox.checked) {
+          selectionSet.add(verb);
+        } else {
+          selectionSet.delete(verb);
+        }
+        updateSelectionCount();
+        return;
+      }
+
+      const button = event.target.closest('button[data-tts]');
+      if (button) {
+        speakIfRequested(button.dataset.tts);
+      }
+    }
+
+    function selectAllCurrent() {
+      document.querySelectorAll('#verbTable input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.checked = true;
+        selectionSet.add(checkbox.dataset.verb);
+      });
+      updateSelectionCount();
+    }
+
+    function clearSelection() {
+      selectionSet.clear();
+      document.querySelectorAll('#verbTable input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+      updateSelectionCount();
+    }
+
+    function playSelection() {
+      if (!selectionSet.size) {
+        speakIfRequested("No verbs selected yet.");
+        return;
+      }
+      const list = verbs.filter((verb) => selectionSet.has(verb.base));
+      const sequence = list.flatMap((verb) => [verb.base, verb.past, verb.participle]);
+      let delay = 0;
+      sequence.forEach((word) => {
+        setTimeout(() => speakIfRequested(word), delay);
+        delay += 900;
+      });
+    }
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function normalizedAnswers(verb) {
+      const base = verb.base.toLowerCase();
+      const past = verb.past.toLowerCase().split(/\s*\/\s*/);
+      const participle = verb.participle.toLowerCase().split(/\s*\/\s*/);
+      const altPast = (verb.altPast || []).map((item) => item.toLowerCase());
+      const altParticiple = (verb.altParticiple || []).map((item) => item.toLowerCase());
+      return {
+        base,
+        past: new Set([...past, ...altPast]),
+        participle: new Set([...participle, ...altParticiple])
+      };
+    }
+
+    function prepareQuiz() {
+      const requested = Number.parseInt(questionCountInput.value, 10) || 10;
+      const selected = verbs.filter((verb) => selectionSet.has(verb.base));
+      const pool = selected.length ? selected : verbs;
+      const amount = Math.min(requested, pool.length);
+      quizQueue = shuffle(pool).slice(0, amount);
+      quizHistory = [];
+      quizIndex = 0;
+      quizResult.style.display = "none";
+      quizPane.style.display = "block";
+      renderQuizStatus();
+      nextQuestion();
+    }
+
+    function renderQuizStatus() {
+      quizStatus.innerHTML = `
+        <span>Question ${Math.min(quizIndex + 1, quizQueue.length)} / ${quizQueue.length}</span>
+        <span>Score: ${quizHistory.filter((item) => item.correct).length} correct</span>
+      `;
+    }
+
+    function buildQuizForm(question) {
+      quizForm.innerHTML = "";
+      if (question.type === "forms") {
+        quizPrompt.textContent = `Complete the forms for \"${question.verb.base}\".`;
+        quizForm.innerHTML = `
+          <label>Past <input type="text" name="past" autocomplete="off" required></label>
+          <label>Past participle <input type="text" name="participle" autocomplete="off" required></label>
+        `;
+      } else {
+        quizPrompt.textContent = `Translate into English: ${question.verb.translation}`;
+        quizForm.innerHTML = `
+          <label>Base form <input type="text" name="base" autocomplete="off" required></label>
+        `;
+      }
+    }
+
+    function nextQuestion() {
+      if (!quizQueue.length || quizIndex >= quizQueue.length) {
+        finishQuiz();
+        return;
+      }
+      currentQuestion = createQuestion(quizQueue[quizIndex]);
+      buildQuizForm(currentQuestion);
+      const firstInput = quizForm.querySelector("input");
+      if (firstInput) {
+        firstInput.focus();
+      }
+      handleQuizAudio("question");
+    }
+
+    function createQuestion(verb) {
+      const mode = quizModeSelect.value;
+      const type = mode === "mixed" ? (Math.random() > 0.5 ? "forms" : "translation") : mode;
+      return { verb, type };
+    }
+
+    function evaluateAnswer(formData) {
+      const info = normalizedAnswers(currentQuestion.verb);
+      let correct = true;
+      const feedback = [];
+
+      if (currentQuestion.type === "forms") {
+        const pastAnswer = (formData.get("past") || "").trim().toLowerCase();
+        const participleAnswer = (formData.get("participle") || "").trim().toLowerCase();
+        if (!info.past.has(pastAnswer)) {
+          correct = false;
+          feedback.push(`Past: ${currentQuestion.verb.past}`);
+        }
+        if (!info.participle.has(participleAnswer)) {
+          correct = false;
+          feedback.push(`Participle: ${currentQuestion.verb.participle}`);
+        }
+      } else {
+        const baseAnswer = (formData.get("base") || "").trim().toLowerCase();
+        if (baseAnswer !== info.base) {
+          correct = false;
+          feedback.push(`Base: ${currentQuestion.verb.base}`);
+        }
+      }
+
+      return { correct, feedback };
+    }
+
+    function recordResult(verb, wasCorrect) {
+      const key = verb.base.toLowerCase();
+      const entry = progress[key] || { correct: 0, incorrect: 0 };
+      if (wasCorrect) entry.correct += 1;
+      else entry.incorrect += 1;
+      entry.lastReviewed = new Date().toISOString();
+      progress[key] = entry;
+      saveProgress();
+    }
+
+    function finishQuiz() {
+      quizPane.style.display = "none";
+      quizPrompt.textContent = "Quiz finished!";
+      const correctAnswers = quizHistory.filter((item) => item.correct).length;
+      quizResult.textContent = `You answered ${correctAnswers} out of ${quizHistory.length} correctly.`;
+      quizResult.className = "quiz-result " + (correctAnswers / Math.max(quizHistory.length, 1) >= 0.7 ? "correct" : "incorrect");
+      quizResult.style.display = "block";
+      updateProgressSummary();
+      renderHardVerbs();
+      handleQuizAudio("answer", `Great job! ${quizResult.textContent}`);
+    }
+
+    function handleQuizAudio(stage, overrideText) {
+      const mode = ttsDuringQuiz.value;
+      if (mode === "off") return;
+      if (stage === "question" && (mode === "question" || mode === "both")) {
+        if (currentQuestion.type === "forms") {
+          speakIfRequested(`${currentQuestion.verb.base}. Provide the past and past participle.`);
+        } else {
+          speakIfRequested(`Translate into English: ${currentQuestion.verb.translation}`);
+        }
+      }
+      if (stage === "answer" && (mode === "answer" || mode === "both")) {
+        speakIfRequested(overrideText || `${currentQuestion.verb.base}, ${currentQuestion.verb.past}, ${currentQuestion.verb.participle}`);
+      }
+    }
+
+    quizForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!currentQuestion) return;
+      const formData = new FormData(quizForm);
+      const { correct, feedback } = evaluateAnswer(formData);
+      recordResult(currentQuestion.verb, correct);
+      quizHistory.push({ verb: currentQuestion.verb, correct });
+      quizIndex += 1;
+      renderQuizStatus();
+
+      if (correct) {
+        quizResult.textContent = "Correct!";
+        quizResult.className = "quiz-result correct";
+      } else {
+        quizResult.textContent = `Check again: ${feedback.join(" | ")}`;
+        quizResult.className = "quiz-result incorrect";
+      }
+      quizResult.style.display = "block";
+      handleQuizAudio("answer", correct ? `${currentQuestion.verb.base}. Correct.` : `Correct forms: ${feedback.join(", ")}`);
+      updateProgressSummary();
+      renderHardVerbs();
+      setTimeout(() => {
+        quizResult.style.display = "none";
+        nextQuestion();
+      }, 1800);
+    });
+
+    skipQuestionBtn.addEventListener("click", () => {
+      if (!currentQuestion) return;
+      quizHistory.push({ verb: currentQuestion.verb, correct: false });
+      recordResult(currentQuestion.verb, false);
+      quizIndex += 1;
+      renderQuizStatus();
+      quizResult.textContent = `Skipped. Correct forms: ${currentQuestion.verb.past} | ${currentQuestion.verb.participle}`;
+      quizResult.className = "quiz-result incorrect";
+      quizResult.style.display = "block";
+      handleQuizAudio("answer", `Correct forms: ${currentQuestion.verb.past}, ${currentQuestion.verb.participle}`);
+      updateProgressSummary();
+      renderHardVerbs();
+      setTimeout(() => {
+        quizResult.style.display = "none";
+        nextQuestion();
+      }, 1800);
+    });
+
+    selectAllBtn.addEventListener("click", selectAllCurrent);
+    clearSelectionBtn.addEventListener("click", clearSelection);
+    playSelectionBtn.addEventListener("click", playSelection);
+    verbTable.addEventListener("click", handleTableInteraction);
+
+    startQuizBtn.addEventListener("click", () => {
+      if (!verbs.length) return;
+      prepareQuiz();
+    });
+
+    resetProgressBtn.addEventListener("click", () => {
+      if (!confirm("Remove all saved progress for this device?")) return;
+      Object.keys(progress).forEach((key) => delete progress[key]);
+      saveProgress();
+      updateProgressSummary();
+      renderHardVerbs();
+      document.querySelectorAll('#verbTable input[type="checkbox"]').forEach((checkbox) => {
+        const row = checkbox.closest("tr");
+        if (row) {
+          const pill = row.querySelector(".stats-pill");
+          if (pill) {
+            pill.textContent = "New";
+            pill.className = "stats-pill neutral";
+          }
+        }
+      });
+      quizResult.textContent = "Progress cleared.";
+      quizResult.className = "quiz-result";
+      quizResult.style.display = "block";
+      setTimeout(() => (quizResult.style.display = "none"), 1800);
+    });
+
+    searchInput.addEventListener("input", () => {
+      activeGroup = null;
+      renderGroups();
+    });
+
+    groupingSelect.addEventListener("change", () => {
+      currentGrouping = groupingSelect.value;
+      activeGroup = null;
+      renderGroups();
+    });
+
+    function updateProgressSummary() {
+      const entries = Object.entries(progress);
+      const studied = entries.filter(([, value]) => (value.correct || value.incorrect)).length;
+      const totalAttempts = entries.reduce((sum, [, value]) => sum + value.correct + value.incorrect, 0);
+      const accuracy = entries.reduce((sum, [, value]) => sum + (value.correct || 0), 0) / Math.max(totalAttempts, 1);
+      const lastTimestamp = entries.reduce((latest, [, value]) => {
+        if (!value.lastReviewed) return latest;
+        const time = Date.parse(value.lastReviewed);
+        return Number.isNaN(time) ? latest : Math.max(latest, time);
+      }, 0);
+
+      studiedVerbsEl.textContent = studied;
+      averageAccuracyEl.textContent = totalAttempts ? formatPercent(accuracy) : "0%";
+      lastReviewedEl.textContent = lastTimestamp ? new Date(lastTimestamp).toLocaleString() : "—";
+    }
+
+    function renderHardVerbs() {
+      hardVerbsEl.innerHTML = "";
+      const hardList = verbs.filter((verb) => {
+        const entry = progress[verb.base.toLowerCase()];
+        if (!entry) return false;
+        const total = (entry.correct || 0) + (entry.incorrect || 0);
+        if (total < 2) return false;
+        const accuracy = (entry.correct || 0) / total;
+        return accuracy < 0.7 || entry.incorrect >= 2;
+      });
+
+      if (!hardList.length) {
+        hardVerbsEl.innerHTML = '<div class="empty-state">Great job! No hard verbs to review yet.</div>';
+        return;
+      }
+
+      hardList.forEach((verb) => {
+        const entry = progress[verb.base.toLowerCase()];
+        const total = entry.correct + entry.incorrect;
+        const accuracy = entry.correct / Math.max(total, 1);
+        const card = document.createElement("article");
+        card.className = "hard-card";
+        card.innerHTML = `
+          <h4>${verb.base} → ${verb.past} → ${verb.participle}</h4>
+          <p>${verb.translation}</p>
+          <p>Attempts: ${total} · Accuracy: ${formatPercent(accuracy)}</p>
+          <div class="verb-actions">
+            <button type="button" data-tts="${verb.base}" data-verb="${verb.base}">🔊 Base</button>
+            <button type="button" data-tts="${verb.past}" data-verb="${verb.base}">🔊 Past</button>
+            <button type="button" data-tts="${verb.participle}" data-verb="${verb.base}">🔊 Participle</button>
+          </div>
+        `;
+        hardVerbsEl.appendChild(card);
+      });
+    }
+
+    function initVoices() {
+      function populateVoices() {
+        voices = window.speechSynthesis.getVoices().filter((voice) => voice.lang.startsWith("en"));
+        voiceSelect.innerHTML = '<option value="">Auto (best available)</option>';
+        voices.forEach((voice) => {
+          const option = document.createElement("option");
+          option.value = voice.voiceURI;
+          option.textContent = `${voice.name} (${voice.lang})`;
+          if (voice.lang === "en-US" && !voiceSelect.value) {
+            option.selected = true;
+          }
+          voiceSelect.appendChild(option);
+        });
+      }
+      populateVoices();
+      window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    function restoreDarkMode() {
+      const stored = localStorage.getItem("irregularVerbCoachTheme");
+      if (stored === "dark") {
+        document.body.classList.add("dark");
+      }
+    }
+
+    darkModeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const mode = document.body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("irregularVerbCoachTheme", mode);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      restoreDarkMode();
+      initVoices();
+      renderGroups();
+      updateProgressSummary();
+      renderHardVerbs();
+    });
+  </script>
+</body>
+</html>
