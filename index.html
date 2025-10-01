@@ -42,17 +42,10 @@
     }
 
     header h1 {
-      margin: 0 0 0.75rem;
-      font-size: clamp(2rem, 5vw, 3rem);
+      margin: 0;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
       letter-spacing: 0.05em;
       text-transform: uppercase;
-    }
-
-    header p {
-      max-width: 780px;
-      margin: 0 auto;
-      font-size: 1rem;
-      opacity: 0.95;
     }
 
     main {
@@ -98,48 +91,6 @@
       display: grid;
       gap: 1rem;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    }
-
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .filter-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      border: 1px solid rgba(37, 99, 235, 0.35);
-      background: rgba(37, 99, 235, 0.08);
-      font-weight: 500;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
-    }
-
-    .filter-chip input {
-      margin: 0;
-      accent-color: var(--accent);
-    }
-
-    .filter-chip.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: white;
-    }
-
-    body.dark .filter-chip {
-      background: rgba(59, 130, 246, 0.12);
-      border-color: rgba(148, 163, 184, 0.5);
-    }
-
-    body.dark .filter-chip.active {
-      background: rgba(37, 99, 235, 0.85);
-      border-color: rgba(37, 99, 235, 0.85);
-      color: white;
     }
 
     label {
@@ -393,9 +344,6 @@
 <body>
   <header>
     <h1>Irregular Verb Coach</h1>
-    <p>
-      Irregular Verbs delivers Catalan translations, frequency-based groupings, and quick quizzes to support every ESL lesson.
-    </p>
   </header>
 
   <main>
@@ -421,12 +369,16 @@
           <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
         </div>
         <div>
-          <label>Filter by frequency</label>
-          <div id="frequencyFilters" class="filter-chips" role="group" aria-label="Filter by frequency"></div>
+          <label for="frequencyFilterSelect">Filter by frequency</label>
+          <select id="frequencyFilterSelect"></select>
         </div>
         <div>
-          <label>Filter by theme</label>
-          <div id="themeFilters" class="filter-chips" role="group" aria-label="Filter by theme"></div>
+          <label for="themeFilterSelect">Filter by theme</label>
+          <select id="themeFilterSelect"></select>
+        </div>
+        <div>
+          <label for="patternFilterSelect">Filter by pattern</label>
+          <select id="patternFilterSelect"></select>
         </div>
         <div>
           <label for="darkModeToggle">Display style</label>
@@ -728,6 +680,17 @@
 
     const STORAGE_KEY = "irregularVerbProgress_v1";
     const frequencyOrder = ["Common", "Less common", "Least common"];
+    const patternOrder = [
+      "No change — 25",
+      "Regular alternative available (-ed) — 24",
+      "“-n / -en / -rn / -wn” participle family — 43",
+      "Pure vowel-change (no -n/-en) — 27",
+      "-OUGHT / -AUGHT family — 8",
+      "E→T/D family (-old/-elt/-ept etc.) — 27",
+      "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16",
+      "Consonant/spelling tweaks — 8",
+      "Suppletive / unique — 4"
+    ];
     const selectionSet = new Set();
     let activeGroup = null;
     let currentGrouping = "frequency";
@@ -761,13 +724,13 @@
     const hardVerbsEl = document.getElementById("hardVerbs");
     const groupingSelect = document.getElementById("groupingSelect");
     const darkModeToggle = document.getElementById("darkModeToggle");
-    const frequencyFilters = document.getElementById("frequencyFilters");
-    const themeFilters = document.getElementById("themeFilters");
+    const frequencyFilterSelect = document.getElementById("frequencyFilterSelect");
+    const themeFilterSelect = document.getElementById("themeFilterSelect");
+    const patternFilterSelect = document.getElementById("patternFilterSelect");
 
-    const activeFrequencyFilters = new Set();
-    const activeThemeFilters = new Set();
     const frequencyOptions = frequencyOrder.filter((option) => verbs.some((verb) => verb.frequency === option));
     const themeOptions = Array.from(new Set(verbs.map((verb) => verb.theme))).sort((a, b) => a.localeCompare(b));
+    const patternOptions = patternOrder.filter((option) => verbs.some((verb) => verb.pattern === option));
 
     const progress = loadProgress();
     totalVerbsEl.textContent = verbs.length;
@@ -791,40 +754,29 @@
       return `${Math.round(value * 100)}%`;
     }
 
-    function renderFilterGroup(container, options, stateSet) {
-      container.innerHTML = "";
+    function populateFilterSelect(select, options, defaultLabel) {
+      select.innerHTML = "";
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = defaultLabel;
+      select.appendChild(defaultOption);
+
       options.forEach((option) => {
-        const label = document.createElement("label");
-        label.className = "filter-chip";
-
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.value = option;
-        input.checked = stateSet.has(option);
-        input.addEventListener("change", (event) => {
-          label.classList.toggle("active", event.target.checked);
-          if (event.target.checked) {
-            stateSet.add(option);
-          } else {
-            stateSet.delete(option);
-          }
-          applyFilters();
-        });
-
-        const text = document.createElement("span");
-        text.textContent = option;
-
-        label.appendChild(input);
-        label.appendChild(text);
-        label.classList.toggle("active", input.checked);
-
-        container.appendChild(label);
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        select.appendChild(opt);
       });
     }
 
-    function renderFilterControls() {
-      renderFilterGroup(frequencyFilters, frequencyOptions, activeFrequencyFilters);
-      renderFilterGroup(themeFilters, themeOptions, activeThemeFilters);
+    function initializeFilterSelects() {
+      populateFilterSelect(frequencyFilterSelect, frequencyOptions, "All frequencies");
+      populateFilterSelect(themeFilterSelect, themeOptions, "All themes");
+      populateFilterSelect(patternFilterSelect, patternOptions, "All patterns");
+
+      frequencyFilterSelect.addEventListener("change", applyFilters);
+      themeFilterSelect.addEventListener("change", applyFilters);
+      patternFilterSelect.addEventListener("change", applyFilters);
     }
 
     function applyFilters() {
@@ -835,17 +787,6 @@
     function renderGroups() {
       const groups = new Map();
       const searchTerm = searchInput.value.trim().toLowerCase();
-      const patternOrder = [
-        "No change — 25",
-        "Regular alternative available (-ed) — 24",
-        "“-n / -en / -rn / -wn” participle family — 43",
-        "Pure vowel-change (no -n/-en) — 27",
-        "-OUGHT / -AUGHT family — 8",
-        "E→T/D family (-old/-elt/-ept etc.) — 27",
-        "Short-vowel → U shift (-ung/-uck/-ound etc.) — 16",
-        "Consonant/spelling tweaks — 8",
-        "Suppletive / unique — 4"
-      ];
 
       verbs.forEach((verb) => {
         const matchesSearch = !searchTerm ||
@@ -854,10 +795,11 @@
           verb.past.toLowerCase().includes(searchTerm) ||
           verb.participle.toLowerCase().includes(searchTerm);
 
-        const matchesFrequencyFilter = !activeFrequencyFilters.size || activeFrequencyFilters.has(verb.frequency);
-        const matchesThemeFilter = !activeThemeFilters.size || activeThemeFilters.has(verb.theme);
+        const matchesFrequencyFilter = !frequencyFilterSelect.value || frequencyFilterSelect.value === verb.frequency;
+        const matchesThemeFilter = !themeFilterSelect.value || themeFilterSelect.value === verb.theme;
+        const matchesPatternFilter = !patternFilterSelect.value || patternFilterSelect.value === verb.pattern;
 
-        if (!matchesSearch || !matchesFrequencyFilter || !matchesThemeFilter) {
+        if (!matchesSearch || !matchesFrequencyFilter || !matchesThemeFilter || !matchesPatternFilter) {
           return;
         }
 
@@ -1306,7 +1248,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       restoreDarkMode();
       initVoices();
-      renderFilterControls();
+      initializeFilterSelects();
       renderGroups();
       updateProgressSummary();
       renderHardVerbs();
