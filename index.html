@@ -100,6 +100,48 @@
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
 
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(37, 99, 235, 0.35);
+      background: rgba(37, 99, 235, 0.08);
+      font-weight: 500;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s ease, border 0.2s ease, color 0.2s ease;
+    }
+
+    .filter-chip input {
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .filter-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    body.dark .filter-chip {
+      background: rgba(59, 130, 246, 0.12);
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+
+    body.dark .filter-chip.active {
+      background: rgba(37, 99, 235, 0.85);
+      border-color: rgba(37, 99, 235, 0.85);
+      color: white;
+    }
+
     label {
       display: block;
       font-weight: 600;
@@ -377,6 +419,14 @@
         <div>
           <label for="searchInput">Quick search</label>
           <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
+        </div>
+        <div>
+          <label>Filter by frequency</label>
+          <div id="frequencyFilters" class="filter-chips" role="group" aria-label="Filter by frequency"></div>
+        </div>
+        <div>
+          <label>Filter by theme</label>
+          <div id="themeFilters" class="filter-chips" role="group" aria-label="Filter by theme"></div>
         </div>
         <div>
           <label for="darkModeToggle">Display style</label>
@@ -677,6 +727,7 @@
     );
 
     const STORAGE_KEY = "irregularVerbProgress_v1";
+    const frequencyOrder = ["Common", "Less common", "Least common"];
     const selectionSet = new Set();
     let activeGroup = null;
     let currentGrouping = "frequency";
@@ -710,6 +761,13 @@
     const hardVerbsEl = document.getElementById("hardVerbs");
     const groupingSelect = document.getElementById("groupingSelect");
     const darkModeToggle = document.getElementById("darkModeToggle");
+    const frequencyFilters = document.getElementById("frequencyFilters");
+    const themeFilters = document.getElementById("themeFilters");
+
+    const activeFrequencyFilters = new Set();
+    const activeThemeFilters = new Set();
+    const frequencyOptions = frequencyOrder.filter((option) => verbs.some((verb) => verb.frequency === option));
+    const themeOptions = Array.from(new Set(verbs.map((verb) => verb.theme))).sort((a, b) => a.localeCompare(b));
 
     const progress = loadProgress();
     totalVerbsEl.textContent = verbs.length;
@@ -733,10 +791,50 @@
       return `${Math.round(value * 100)}%`;
     }
 
+    function renderFilterGroup(container, options, stateSet) {
+      container.innerHTML = "";
+      options.forEach((option) => {
+        const label = document.createElement("label");
+        label.className = "filter-chip";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = option;
+        input.checked = stateSet.has(option);
+        input.addEventListener("change", (event) => {
+          label.classList.toggle("active", event.target.checked);
+          if (event.target.checked) {
+            stateSet.add(option);
+          } else {
+            stateSet.delete(option);
+          }
+          applyFilters();
+        });
+
+        const text = document.createElement("span");
+        text.textContent = option;
+
+        label.appendChild(input);
+        label.appendChild(text);
+        label.classList.toggle("active", input.checked);
+
+        container.appendChild(label);
+      });
+    }
+
+    function renderFilterControls() {
+      renderFilterGroup(frequencyFilters, frequencyOptions, activeFrequencyFilters);
+      renderFilterGroup(themeFilters, themeOptions, activeThemeFilters);
+    }
+
+    function applyFilters() {
+      activeGroup = null;
+      renderGroups();
+    }
+
     function renderGroups() {
       const groups = new Map();
       const searchTerm = searchInput.value.trim().toLowerCase();
-      const frequencyOrder = ["Common", "Less common", "Least common"];
       const patternOrder = [
         "No change — 25",
         "Regular alternative available (-ed) — 24",
@@ -756,7 +854,10 @@
           verb.past.toLowerCase().includes(searchTerm) ||
           verb.participle.toLowerCase().includes(searchTerm);
 
-        if (!matchesSearch) {
+        const matchesFrequencyFilter = !activeFrequencyFilters.size || activeFrequencyFilters.has(verb.frequency);
+        const matchesThemeFilter = !activeThemeFilters.size || activeThemeFilters.has(verb.theme);
+
+        if (!matchesSearch || !matchesFrequencyFilter || !matchesThemeFilter) {
           return;
         }
 
@@ -787,21 +888,26 @@
       groupList.innerHTML = "";
 
       if (!sortedGroups.length) {
+        activeGroup = null;
         groupList.innerHTML = '<div class="empty-state">No verbs match your search.</div>';
         renderVerbTable([]);
         return;
       }
 
+      let desiredGroupName = activeGroup;
+      if (!desiredGroupName || !sortedGroups.some(([name]) => name === desiredGroupName)) {
+        desiredGroupName = sortedGroups[0][0];
+      }
+
       sortedGroups.forEach(([name, list]) => {
         const card = document.createElement("article");
-        card.className = "group-card" + (activeGroup === name ? " active" : "");
+        card.className = "group-card" + (desiredGroupName === name ? " active" : "");
         card.tabIndex = 0;
         card.setAttribute("role", "listitem");
         card.innerHTML = `<h3>${name}</h3><p>${list.length} verb${list.length === 1 ? "" : "s"}</p>`;
         card.addEventListener("click", () => {
           activeGroup = name;
           renderGroups();
-          renderVerbTable(list);
         });
         card.addEventListener("keypress", (event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -812,10 +918,9 @@
         groupList.appendChild(card);
       });
 
-      if (!activeGroup && sortedGroups.length) {
-        activeGroup = sortedGroups[0][0];
-        renderVerbTable(sortedGroups[0][1]);
-      }
+      activeGroup = desiredGroupName;
+      const activeEntry = sortedGroups.find(([name]) => name === activeGroup);
+      renderVerbTable(activeEntry ? activeEntry[1] : []);
     }
 
     function renderVerbTable(list) {
@@ -1201,6 +1306,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       restoreDarkMode();
       initVoices();
+      renderFilterControls();
       renderGroups();
       updateProgressSummary();
       renderHardVerbs();
