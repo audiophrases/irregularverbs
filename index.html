@@ -590,7 +590,8 @@
       { base: "prove", past: "proved", participle: "proved / proven", translation: "demostrar", frequency: "Less common", pattern: "Regular alternative available (-ed) — 24", theme: "Communication", altParticiple: ["proven"] },
       { base: "put", past: "put", participle: "put", translation: "posar", frequency: "Common", pattern: "No change — 25", theme: "Actions & Impact" },
       { base: "quit", past: "quit", participle: "quit", translation: "deixar", frequency: "Less common", pattern: "No change — 25", theme: "Daily Routines" },
-      { base: "read", past: "read", participle: "read", translation: "llegir", frequency: "Common", pattern: "No change — 25", theme: "Communication" },
+      // Optional ttsBase/ttsPast/ttsParticiple properties override pronunciation for the speech buttons when needed.
+      { base: "read", past: "read", participle: "read", ttsPast: "red", ttsParticiple: "red", translation: "llegir", frequency: "Common", pattern: "No change — 25", theme: "Communication" },
       { base: "rid", past: "rid", participle: "rid", translation: "lliurar-se", frequency: "Least common", pattern: "No change — 25", theme: "Actions & Impact" },
       { base: "ride", past: "rode", participle: "ridden", translation: "muntar", frequency: "Less common", pattern: "“-n / -en / -rn / -wn” participle family — 43", theme: "Movement" },
       { base: "ring", past: "rang", participle: "rung", translation: "tocar (campana)", frequency: "Less common", pattern: "Pure vowel-change (no -n/-en) — 27", theme: "Communication" },
@@ -837,9 +838,9 @@
           <td>${verb.translation}</td>
           <td><span class="stats-pill ${statsClass}">${total ? `${Math.round(accuracy * 100)}%` : "New"}</span></td>
           <td class="verb-actions">
-            <button type="button" data-tts="${verb.base}" data-verb="${verb.base}">🔊 Base</button>
-            <button type="button" data-tts="${verb.past}" data-verb="${verb.base}">🔊 Past</button>
-            <button type="button" data-tts="${verb.participle}" data-verb="${verb.base}">🔊 Participle</button>
+            <button type="button" data-tts="${verb.ttsBase || verb.base}" data-verb="${verb.base}">🔊 Base</button>
+            <button type="button" data-tts="${verb.ttsPast || verb.past}" data-verb="${verb.base}">🔊 Past</button>
+            <button type="button" data-tts="${verb.ttsParticiple || verb.participle}" data-verb="${verb.base}">🔊 Participle</button>
           </td>
         `;
         fragment.appendChild(row);
