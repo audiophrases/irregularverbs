@@ -264,6 +264,84 @@
     .quiz-card {
       display: grid;
       gap: 1rem;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .quiz-card h3 {
+      font-size: 1.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .quiz-description {
+      margin: 0;
+      color: #475569;
+    }
+
+    body.dark .quiz-description {
+      color: #cbd5f5;
+    }
+
+    .quiz-actions {
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .quiz-actions > .flex {
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .flashcard-pane {
+      display: grid;
+      gap: 0.75rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    body.dark .flashcard-pane {
+      background: rgba(59, 130, 246, 0.18);
+    }
+
+    .flashcard-pane p {
+      margin: 0;
+    }
+
+    #flashcardAnswer {
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .advanced-options {
+      margin-top: 1.25rem;
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      background: rgba(148, 163, 184, 0.12);
+    }
+
+    body.dark .advanced-options {
+      border-color: rgba(226, 232, 240, 0.2);
+      background: rgba(30, 41, 59, 0.45);
+    }
+
+    .advanced-options summary {
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .advanced-options .controls-grid {
+      margin-top: 1rem;
+    }
+
+    .advanced-actions {
+      justify-content: flex-start;
     }
 
     .quiz-status {
@@ -393,22 +471,31 @@
           <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
         </div>
         <div>
-          <label for="frequencyFilterSelect">Filter by frequency</label>
-          <select id="frequencyFilterSelect"></select>
-        </div>
-        <div>
-          <label for="themeFilterSelect">Filter by theme</label>
-          <select id="themeFilterSelect"></select>
-        </div>
-        <div>
-          <label for="patternFilterSelect">Filter by pattern</label>
-          <select id="patternFilterSelect"></select>
-        </div>
-        <div>
           <label for="darkModeToggle">Display style</label>
           <button id="darkModeToggle" type="button" class="secondary">Toggle dark mode</button>
         </div>
       </div>
+      <details class="advanced-options">
+        <summary>Advanced options</summary>
+        <div class="controls-grid">
+          <div>
+            <label for="frequencyFilterSelect">Filter by frequency</label>
+            <select id="frequencyFilterSelect"></select>
+          </div>
+          <div>
+            <label for="themeFilterSelect">Filter by theme</label>
+            <select id="themeFilterSelect"></select>
+          </div>
+          <div>
+            <label for="patternFilterSelect">Filter by pattern</label>
+            <select id="patternFilterSelect"></select>
+          </div>
+        </div>
+        <div class="flex advanced-actions">
+          <button type="button" id="simpleModeBtn">Simplify to common verbs</button>
+          <button type="button" class="secondary" id="showAllVerbsBtn">Show every verb</button>
+        </div>
+      </details>
       <div class="group-list" id="groupList" role="list"></div>
     </section>
 
@@ -448,6 +535,10 @@
     <section aria-labelledby="quiz-section">
       <h2 id="quiz-section"><span>3</span>Practice &amp; quiz</h2>
       <div class="quiz-card">
+        <p class="quiz-description">
+          Use the tracked practice to save your results for next time, or open the flashcards for a quick review with no
+          progress tracking.
+        </p>
         <div class="controls-grid">
           <div>
             <label for="questionCount">Number of questions</label>
@@ -462,8 +553,11 @@
             </select>
           </div>
         </div>
-        <div class="flex" style="justify-content: space-between;">
-          <button type="button" id="startQuizBtn">Start quiz with selected verbs</button>
+        <div class="flex quiz-actions">
+          <div class="flex">
+            <button type="button" id="startQuizBtn">Start tracked practice</button>
+            <button type="button" class="secondary" id="startPracticeBtn">Flashcard practice (no save)</button>
+          </div>
           <button type="button" class="secondary" id="resetProgressBtn">Reset saved progress</button>
         </div>
         <div class="quiz-status" id="quizStatus" aria-live="polite"></div>
@@ -474,6 +568,16 @@
           <div class="flex">
             <button type="submit" form="quizForm">Check answer</button>
             <button type="button" class="secondary" id="skipQuestionBtn">Skip</button>
+          </div>
+        </div>
+        <div id="flashcardPane" class="flashcard-pane" style="display: none;">
+          <h3 id="flashcardPrompt"></h3>
+          <p id="flashcardHint"></p>
+          <div id="flashcardAnswer" hidden></div>
+          <div class="flex">
+            <button type="button" id="revealFlashcardBtn">Reveal answer</button>
+            <button type="button" class="secondary" id="nextFlashcardBtn">Next card</button>
+            <button type="button" class="secondary" id="closeFlashcardBtn">Close practice</button>
           </div>
         </div>
       </div>
@@ -723,6 +827,8 @@
     let quizIndex = 0;
     let currentQuestion = null;
     let voices = [];
+    let flashcardQueue = [];
+    let flashcardIndex = 0;
 
     const voiceSelect = document.getElementById("voiceSelect");
     const groupList = document.getElementById("groupList");
@@ -740,6 +846,7 @@
     const questionCountInput = document.getElementById("questionCount");
     const quizModeSelect = document.getElementById("quizMode");
     const startQuizBtn = document.getElementById("startQuizBtn");
+    const startPracticeBtn = document.getElementById("startPracticeBtn");
     const resetProgressBtn = document.getElementById("resetProgressBtn");
     const totalVerbsEl = document.getElementById("totalVerbs");
     const studiedVerbsEl = document.getElementById("studiedVerbs");
@@ -751,7 +858,17 @@
     const frequencyFilterSelect = document.getElementById("frequencyFilterSelect");
     const themeFilterSelect = document.getElementById("themeFilterSelect");
     const patternFilterSelect = document.getElementById("patternFilterSelect");
+    const simpleModeBtn = document.getElementById("simpleModeBtn");
+    const showAllVerbsBtn = document.getElementById("showAllVerbsBtn");
+    const flashcardPane = document.getElementById("flashcardPane");
+    const flashcardPrompt = document.getElementById("flashcardPrompt");
+    const flashcardHint = document.getElementById("flashcardHint");
+    const flashcardAnswer = document.getElementById("flashcardAnswer");
+    const revealFlashcardBtn = document.getElementById("revealFlashcardBtn");
+    const nextFlashcardBtn = document.getElementById("nextFlashcardBtn");
+    const closeFlashcardBtn = document.getElementById("closeFlashcardBtn");
 
+    const DEFAULT_FREQUENCY = "Common";
     const frequencyOptions = frequencyOrder.filter((option) => verbs.some((verb) => verb.frequency === option));
     const themeOptions = Array.from(new Set(verbs.map((verb) => verb.theme))).sort((a, b) => a.localeCompare(b));
     const patternOptions = patternOrder.filter((option) => verbs.some((verb) => verb.pattern === option));
@@ -801,6 +918,22 @@
       frequencyFilterSelect.addEventListener("change", applyFilters);
       themeFilterSelect.addEventListener("change", applyFilters);
       patternFilterSelect.addEventListener("change", applyFilters);
+    }
+
+    function applyDefaultFilters() {
+      frequencyFilterSelect.value = DEFAULT_FREQUENCY;
+      themeFilterSelect.value = "";
+      patternFilterSelect.value = "";
+    }
+
+    function setDefaultSelection() {
+      selectionSet.clear();
+      verbs.forEach((verb) => {
+        if (verb.frequency === DEFAULT_FREQUENCY) {
+          selectionSet.add(verb.base);
+        }
+      });
+      updateSelectionCount();
     }
 
     function applyFilters() {
@@ -1006,6 +1139,7 @@
       quizHistory = [];
       quizIndex = 0;
       quizResult.style.display = "none";
+      endFlashcardPractice({ silent: true });
       quizPane.style.display = "block";
       renderQuizStatus();
       nextQuestion();
@@ -1013,9 +1147,89 @@
 
     function renderQuizStatus() {
       quizStatus.innerHTML = `
+        <span>Tracked practice</span>
         <span>Question ${Math.min(quizIndex + 1, quizQueue.length)} / ${quizQueue.length}</span>
         <span>Score: ${quizHistory.filter((item) => item.correct).length} correct</span>
       `;
+    }
+
+    function getPracticePool() {
+      const selected = verbs.filter((verb) => selectionSet.has(verb.base));
+      if (selected.length) {
+        return selected;
+      }
+      return verbs.filter((verb) => verb.frequency === DEFAULT_FREQUENCY);
+    }
+
+    function startFlashcardPractice() {
+      const pool = getPracticePool();
+      if (!pool.length) {
+        quizStatus.textContent = "No verbs available for practice.";
+        return;
+      }
+      const requested = Number.parseInt(questionCountInput.value, 10) || pool.length;
+      const amount = Math.min(requested, pool.length);
+      flashcardQueue = shuffle(pool).slice(0, amount);
+      flashcardIndex = 0;
+      quizPane.style.display = "none";
+      quizResult.style.display = "none";
+      flashcardPane.style.display = "grid";
+      renderFlashcard();
+    }
+
+    function renderFlashcard() {
+      if (!flashcardQueue.length) {
+        quizStatus.textContent = "No verbs available for practice.";
+        flashcardPane.style.display = "none";
+        return;
+      }
+
+      if (flashcardIndex >= flashcardQueue.length) {
+        flashcardQueue = shuffle(flashcardQueue);
+        flashcardIndex = 0;
+      }
+
+      const verb = flashcardQueue[flashcardIndex];
+      const type = Math.random() > 0.5 ? "forms" : "translation";
+
+      flashcardAnswer.hidden = true;
+      revealFlashcardBtn.disabled = false;
+      nextFlashcardBtn.disabled = true;
+
+      if (type === "forms") {
+        flashcardPrompt.textContent = `Base form: ${verb.base}`;
+        flashcardHint.textContent = "Think of the past and past participle.";
+        flashcardAnswer.textContent = `${verb.past} · ${verb.participle}`;
+      } else {
+        flashcardPrompt.textContent = `Catalan meaning: ${verb.translation}`;
+        flashcardHint.textContent = "Say the English base form.";
+        flashcardAnswer.textContent = verb.base;
+      }
+
+      quizStatus.textContent = `Flashcard ${flashcardIndex + 1} / ${flashcardQueue.length} — Mixed forms & translations (not saved)`;
+    }
+
+    function advanceFlashcard() {
+      if (!flashcardQueue.length) return;
+      flashcardIndex += 1;
+      if (flashcardIndex >= flashcardQueue.length) {
+        flashcardQueue = shuffle(flashcardQueue);
+        flashcardIndex = 0;
+      }
+      renderFlashcard();
+    }
+
+    function endFlashcardPractice({ silent = false } = {}) {
+      flashcardPane.style.display = "none";
+      flashcardPrompt.textContent = "";
+      flashcardHint.textContent = "";
+      flashcardAnswer.textContent = "";
+      flashcardAnswer.hidden = true;
+      revealFlashcardBtn.disabled = false;
+      nextFlashcardBtn.disabled = true;
+      if (!silent) {
+        quizStatus.textContent = "Flashcard practice closed.";
+      }
     }
 
     function buildQuizForm(question) {
@@ -1153,6 +1367,25 @@
       prepareQuiz();
     });
 
+    startPracticeBtn.addEventListener("click", () => {
+      if (!verbs.length) return;
+      startFlashcardPractice();
+    });
+
+    revealFlashcardBtn.addEventListener("click", () => {
+      flashcardAnswer.hidden = false;
+      revealFlashcardBtn.disabled = true;
+      nextFlashcardBtn.disabled = false;
+    });
+
+    nextFlashcardBtn.addEventListener("click", () => {
+      advanceFlashcard();
+    });
+
+    closeFlashcardBtn.addEventListener("click", () => {
+      endFlashcardPractice();
+    });
+
     resetProgressBtn.addEventListener("click", () => {
       if (!confirm("Remove all saved progress for this device?")) return;
       Object.keys(progress).forEach((key) => delete progress[key]);
@@ -1184,6 +1417,24 @@
       currentGrouping = groupingSelect.value;
       activeGroup = null;
       renderGroups();
+    });
+
+    simpleModeBtn.addEventListener("click", () => {
+      applyDefaultFilters();
+      setDefaultSelection();
+      searchInput.value = "";
+      applyFilters();
+      const container = simpleModeBtn.closest("details");
+      if (container) {
+        container.open = false;
+      }
+    });
+
+    showAllVerbsBtn.addEventListener("click", () => {
+      frequencyFilterSelect.value = "";
+      themeFilterSelect.value = "";
+      patternFilterSelect.value = "";
+      applyFilters();
     });
 
     function updateProgressSummary() {
@@ -1273,6 +1524,8 @@
       restoreDarkMode();
       initVoices();
       initializeFilterSelects();
+      applyDefaultFilters();
+      setDefaultSelection();
       renderGroups();
       updateProgressSummary();
       renderHardVerbs();
