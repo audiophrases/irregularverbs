@@ -167,42 +167,51 @@
       box-shadow: none;
     }
 
-    .group-list {
+    .study-mode-grid {
       display: grid;
-      gap: 1rem;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      margin-top: 1rem;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      margin-top: 0.75rem;
     }
 
-    .group-card {
+    button.study-mode-button {
+      background: white;
+      color: inherit;
+      border: 1px solid rgba(37, 99, 235, 0.35);
       border-radius: 14px;
-      padding: 1rem;
-      background: var(--bg-soft);
-      border: 1px solid transparent;
-      transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
-      cursor: pointer;
+      padding: 0.9rem 1rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: none;
     }
 
-    body.dark .group-card {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .group-card:hover,
-    .group-card.active {
-      transform: translateY(-3px);
-      border-color: var(--accent);
-      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
-    }
-
-    .group-card h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1.1rem;
-    }
-
-    .group-card p {
-      margin: 0;
-      font-size: 0.9rem;
+    button.study-mode-button span {
+      font-weight: 400;
+      font-size: 0.95rem;
       opacity: 0.85;
+    }
+
+    button.study-mode-button:hover,
+    button.study-mode-button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    body.dark button.study-mode-button {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid rgba(226, 232, 240, 0.25);
+    }
+
+    .study-mode-status {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    body.dark .study-mode-status {
+      color: #cbd5f5;
     }
 
     table {
@@ -230,6 +239,19 @@
 
     tbody tr:hover {
       background: rgba(37, 99, 235, 0.08);
+    }
+
+    .empty-row td {
+      text-align: center;
+      font-style: italic;
+      padding: 1rem;
+      color: #475569;
+      background: rgba(148, 163, 184, 0.18);
+    }
+
+    body.dark .empty-row td {
+      color: #cbd5f5;
+      background: rgba(148, 163, 184, 0.25);
     }
 
     .verb-actions {
@@ -453,12 +475,22 @@
       <h2 id="study-controls"><span>1</span>Choose how to study</h2>
       <div class="controls-grid">
         <div>
-          <label for="groupingSelect">Grouping style</label>
-          <select id="groupingSelect">
-            <option value="frequency">By frequency</option>
-            <option value="pattern">By spelling &amp; sound pattern</option>
-            <option value="theme">By semantic theme</option>
-          </select>
+          <p style="margin: 0; font-weight: 600;">Start with the curated common verbs.</p>
+          <div class="study-mode-grid">
+            <button type="button" id="readModeBtn" class="study-mode-button">
+              Read the list
+              <span>Review the verbs visually below.</span>
+            </button>
+            <button type="button" id="listenModeBtn" class="study-mode-button">
+              Listen &amp; repeat
+              <span>Hear each verb with its key forms.</span>
+            </button>
+            <button type="button" id="practiceModeBtn" class="study-mode-button">
+              Practice common verbs
+              <span>Open flashcards with the most frequent verbs.</span>
+            </button>
+          </div>
+          <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
         </div>
         <div>
           <label for="voiceSelect">Voice for text-to-speech</label>
@@ -477,6 +509,7 @@
       </div>
       <details class="advanced-options">
         <summary>Advanced options</summary>
+        <p style="margin: 0.5rem 0 0;">Fine-tune the list with filters or restore the simplified view.</p>
         <div class="controls-grid">
           <div>
             <label for="frequencyFilterSelect">Filter by frequency</label>
@@ -496,7 +529,6 @@
           <button type="button" class="secondary" id="showAllVerbsBtn">Show every verb</button>
         </div>
       </details>
-      <div class="group-list" id="groupList" role="list"></div>
     </section>
 
     <section aria-labelledby="verb-table">
@@ -820,8 +852,6 @@
       "Suppletive / unique — 4"
     ];
     const selectionSet = new Set();
-    let activeGroup = null;
-    let currentGrouping = "frequency";
     let quizQueue = [];
     let quizHistory = [];
     let quizIndex = 0;
@@ -829,9 +859,9 @@
     let voices = [];
     let flashcardQueue = [];
     let flashcardIndex = 0;
+    let listenTimeouts = [];
 
     const voiceSelect = document.getElementById("voiceSelect");
-    const groupList = document.getElementById("groupList");
     const verbTable = document.getElementById("verbTable");
     const searchInput = document.getElementById("searchInput");
     const selectionCount = document.getElementById("selectionCount");
@@ -853,13 +883,16 @@
     const averageAccuracyEl = document.getElementById("averageAccuracy");
     const lastReviewedEl = document.getElementById("lastReviewed");
     const hardVerbsEl = document.getElementById("hardVerbs");
-    const groupingSelect = document.getElementById("groupingSelect");
     const darkModeToggle = document.getElementById("darkModeToggle");
     const frequencyFilterSelect = document.getElementById("frequencyFilterSelect");
     const themeFilterSelect = document.getElementById("themeFilterSelect");
     const patternFilterSelect = document.getElementById("patternFilterSelect");
     const simpleModeBtn = document.getElementById("simpleModeBtn");
     const showAllVerbsBtn = document.getElementById("showAllVerbsBtn");
+    const readModeBtn = document.getElementById("readModeBtn");
+    const listenModeBtn = document.getElementById("listenModeBtn");
+    const practiceModeBtn = document.getElementById("practiceModeBtn");
+    const studyModeStatus = document.getElementById("studyModeStatus");
     const flashcardPane = document.getElementById("flashcardPane");
     const flashcardPrompt = document.getElementById("flashcardPrompt");
     const flashcardHint = document.getElementById("flashcardHint");
@@ -936,94 +969,105 @@
       updateSelectionCount();
     }
 
-    function applyFilters() {
-      activeGroup = null;
-      renderGroups();
+    function resetToDefaultView() {
+      applyDefaultFilters();
+      setDefaultSelection();
+      searchInput.value = "";
+      applyFilters();
     }
 
-    function renderGroups() {
-      const groups = new Map();
+    function getFilteredVerbs() {
       const searchTerm = searchInput.value.trim().toLowerCase();
 
-      verbs.forEach((verb) => {
-        const matchesSearch = !searchTerm ||
-          verb.base.toLowerCase().includes(searchTerm) ||
-          verb.translation.toLowerCase().includes(searchTerm) ||
-          verb.past.toLowerCase().includes(searchTerm) ||
-          verb.participle.toLowerCase().includes(searchTerm);
+      return verbs
+        .filter((verb) => {
+          const matchesSearch = !searchTerm ||
+            verb.base.toLowerCase().includes(searchTerm) ||
+            verb.translation.toLowerCase().includes(searchTerm) ||
+            verb.past.toLowerCase().includes(searchTerm) ||
+            verb.participle.toLowerCase().includes(searchTerm);
 
-        const matchesFrequencyFilter = !frequencyFilterSelect.value || frequencyFilterSelect.value === verb.frequency;
-        const matchesThemeFilter = !themeFilterSelect.value || themeFilterSelect.value === verb.theme;
-        const matchesPatternFilter = !patternFilterSelect.value || patternFilterSelect.value === verb.pattern;
+          const matchesFrequencyFilter = !frequencyFilterSelect.value || frequencyFilterSelect.value === verb.frequency;
+          const matchesThemeFilter = !themeFilterSelect.value || themeFilterSelect.value === verb.theme;
+          const matchesPatternFilter = !patternFilterSelect.value || patternFilterSelect.value === verb.pattern;
 
-        if (!matchesSearch || !matchesFrequencyFilter || !matchesThemeFilter || !matchesPatternFilter) {
-          return;
+          return matchesSearch && matchesFrequencyFilter && matchesThemeFilter && matchesPatternFilter;
+        })
+        .sort((a, b) => {
+          const aIndex = frequencyOrder.indexOf(a.frequency);
+          const bIndex = frequencyOrder.indexOf(b.frequency);
+          const freqDiff = (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
+          if (freqDiff !== 0) return freqDiff;
+          return a.base.localeCompare(b.base);
+        });
+    }
+
+    function stopListeningSequence() {
+      listenTimeouts.forEach((timeout) => clearTimeout(timeout));
+      listenTimeouts = [];
+      window.speechSynthesis.cancel();
+    }
+
+    function applyFilters() {
+      stopListeningSequence();
+      renderVerbTable(getFilteredVerbs());
+    }
+
+    function startListeningToCurrentList() {
+      const verbsToPlay = getFilteredVerbs().slice(0, 12);
+      if (!verbsToPlay.length) {
+        if (studyModeStatus) {
+          studyModeStatus.textContent = "No verbs available to listen to. Adjust your filters in Advanced options.";
         }
-
-        const key = currentGrouping === "frequency"
-          ? verb.frequency
-          : currentGrouping === "pattern"
-            ? verb.pattern
-            : verb.theme;
-        if (!groups.has(key)) {
-          groups.set(key, []);
-        }
-        groups.get(key).push(verb);
-      });
-
-      const sortedGroups = Array.from(groups.entries()).sort((a, b) => {
-        if (currentGrouping === "frequency") {
-          const aIndex = frequencyOrder.indexOf(a[0]);
-          const bIndex = frequencyOrder.indexOf(b[0]);
-          return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
-        }
-        if (currentGrouping === "pattern") {
-          const aIndex = patternOrder.indexOf(a[0]);
-          const bIndex = patternOrder.indexOf(b[0]);
-          return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
-        }
-        return a[0].localeCompare(b[0]);
-      });
-      groupList.innerHTML = "";
-
-      if (!sortedGroups.length) {
-        activeGroup = null;
-        groupList.innerHTML = '<div class="empty-state">No verbs match your search.</div>';
-        renderVerbTable([]);
         return;
       }
 
-      let desiredGroupName = activeGroup;
-      if (!desiredGroupName || !sortedGroups.some(([name]) => name === desiredGroupName)) {
-        desiredGroupName = sortedGroups[0][0];
+      stopListeningSequence();
+
+      if (studyModeStatus) {
+        studyModeStatus.textContent = `Listening through ${verbsToPlay.length} verb${verbsToPlay.length === 1 ? "" : "s"}.`;
       }
 
-      sortedGroups.forEach(([name, list]) => {
-        const card = document.createElement("article");
-        card.className = "group-card" + (desiredGroupName === name ? " active" : "");
-        card.tabIndex = 0;
-        card.setAttribute("role", "listitem");
-        card.innerHTML = `<h3>${name}</h3><p>${list.length} verb${list.length === 1 ? "" : "s"}</p>`;
-        card.addEventListener("click", () => {
-          activeGroup = name;
-          renderGroups();
-        });
-        card.addEventListener("keypress", (event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            card.click();
+      let delay = 0;
+      verbsToPlay.forEach((verb, index) => {
+        listenTimeouts.push(setTimeout(() => {
+          if (studyModeStatus) {
+            studyModeStatus.textContent = `Listening: ${verb.base} (${index + 1}/${verbsToPlay.length})`;
           }
-        });
-        groupList.appendChild(card);
+          speakIfRequested(verb.ttsBase || verb.base);
+        }, delay));
+        delay += 1100;
+        listenTimeouts.push(setTimeout(() => {
+          speakIfRequested(verb.ttsPast || verb.past);
+        }, delay));
+        delay += 1100;
+        listenTimeouts.push(setTimeout(() => {
+          speakIfRequested(verb.ttsParticiple || verb.participle);
+        }, delay));
+        delay += 1400;
       });
 
-      activeGroup = desiredGroupName;
-      const activeEntry = sortedGroups.find(([name]) => name === activeGroup);
-      renderVerbTable(activeEntry ? activeEntry[1] : []);
+      listenTimeouts.push(setTimeout(() => {
+        if (studyModeStatus) {
+          studyModeStatus.textContent = `Finished listening to ${verbsToPlay.length} verb${verbsToPlay.length === 1 ? "" : "s"}.`;
+        }
+      }, delay));
     }
 
     function renderVerbTable(list) {
       const fragment = document.createDocumentFragment();
+      if (!list.length) {
+        const row = document.createElement("tr");
+        row.className = "empty-row";
+        const cell = document.createElement("td");
+        cell.colSpan = 7;
+        cell.textContent = "No verbs match your search.";
+        row.appendChild(cell);
+        verbTable.innerHTML = "";
+        verbTable.appendChild(row);
+        updateSelectionCount();
+        return;
+      }
       list.forEach((verb) => {
         const row = document.createElement("tr");
         const entryKey = verb.base.toLowerCase();
@@ -1364,11 +1408,13 @@
 
     startQuizBtn.addEventListener("click", () => {
       if (!verbs.length) return;
+      stopListeningSequence();
       prepareQuiz();
     });
 
     startPracticeBtn.addEventListener("click", () => {
       if (!verbs.length) return;
+      stopListeningSequence();
       startFlashcardPractice();
     });
 
@@ -1408,22 +1454,40 @@
       setTimeout(() => (quizResult.style.display = "none"), 1800);
     });
 
-    searchInput.addEventListener("input", () => {
-      activeGroup = null;
-      renderGroups();
+    readModeBtn.addEventListener("click", () => {
+      resetToDefaultView();
+      stopListeningSequence();
+      if (studyModeStatus) {
+        studyModeStatus.textContent = "Scroll through the verbs below to read them at your own pace.";
+      }
+      endFlashcardPractice({ silent: true });
+      document.getElementById("verb-table").scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    groupingSelect.addEventListener("change", () => {
-      currentGrouping = groupingSelect.value;
-      activeGroup = null;
-      renderGroups();
+    listenModeBtn.addEventListener("click", () => {
+      resetToDefaultView();
+      endFlashcardPractice({ silent: true });
+      startListeningToCurrentList();
+      document.getElementById("verb-table").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    practiceModeBtn.addEventListener("click", () => {
+      resetToDefaultView();
+      stopListeningSequence();
+      if (!verbs.length) return;
+      startFlashcardPractice();
+      document.getElementById("quiz-section").scrollIntoView({ behavior: "smooth", block: "start" });
+      if (studyModeStatus) {
+        studyModeStatus.textContent = "Flashcard practice opened with the common verbs.";
+      }
+    });
+
+    searchInput.addEventListener("input", () => {
+      applyFilters();
     });
 
     simpleModeBtn.addEventListener("click", () => {
-      applyDefaultFilters();
-      setDefaultSelection();
-      searchInput.value = "";
-      applyFilters();
+      resetToDefaultView();
       const container = simpleModeBtn.closest("details");
       if (container) {
         container.open = false;
@@ -1526,7 +1590,7 @@
       initializeFilterSelects();
       applyDefaultFilters();
       setDefaultSelection();
-      renderGroups();
+      renderVerbTable(getFilteredVerbs());
       updateProgressSummary();
       renderHardVerbs();
     });
