@@ -112,6 +112,21 @@
       transition: border 0.2s ease, box-shadow 0.2s ease;
     }
 
+    select,
+    input[type="number"],
+    input[type="search"] {
+      color: inherit;
+    }
+
+    select {
+      background-color: white;
+      background-image: linear-gradient(transparent, transparent);
+    }
+
+    select option {
+      color: #111827;
+    }
+
     body.dark select,
     body.dark input[type="number"],
     body.dark button,
@@ -119,6 +134,15 @@
       background: rgba(17, 24, 39, 0.9);
       color: inherit;
       border: 1px solid rgba(226, 232, 240, 0.2);
+    }
+
+    body.dark select {
+      background-color: rgba(17, 24, 39, 0.95);
+    }
+
+    body.dark select option {
+      color: #e2e8f0;
+      background-color: #0f172a;
     }
 
     button {
