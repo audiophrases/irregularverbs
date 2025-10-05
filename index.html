@@ -195,18 +195,12 @@
       gap: 0.35rem;
     }
 
-    .selection-arrow {
-      color: var(--accent);
-      font-size: 1rem;
-      letter-spacing: 0.15em;
+    .selection-text {
+      font-size: calc(1rem + 10.67px);
     }
 
     .selection-count {
-      font-size: 1.1rem;
-    }
-
-    body.dark .selection-arrow {
-      color: #bfdbfe;
+      font-size: calc(1rem + 10.67px);
     }
 
     button.icon-button {
@@ -393,10 +387,6 @@
       margin-top: 1rem;
     }
 
-    .advanced-actions {
-      justify-content: flex-start;
-    }
-
     .quiz-status {
       display: flex;
       flex-wrap: wrap;
@@ -502,13 +492,12 @@
   </header>
 
   <main>
-    <section aria-labelledby="study-controls">
-      <h2 id="study-controls"><span>1</span>Choose how to study</h2>
+    <section aria-label="Study controls">
+      <h2 id="study-controls" class="sr-only">Study controls</h2>
       <div class="controls-grid">
         <div>
-          <p style="margin: 0; font-weight: 600;">Start with the curated common verbs.</p>
           <div class="study-actions">
-            <button type="button" id="playAllBtn" class="study-play-button">Play all pronunciations</button>
+            <button type="button" id="playAllBtn" class="study-play-button">🗣️ Play all</button>
           </div>
           <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
         </div>
@@ -525,7 +514,6 @@
       </div>
       <details class="advanced-options">
         <summary>More verbs</summary>
-        <p style="margin: 0.5rem 0 0;">Fine-tune the list with filters or restore the simplified view.</p>
         <div class="controls-grid">
           <div>
             <label for="frequencyFilterSelect">Filter by frequency</label>
@@ -540,29 +528,19 @@
             <select id="patternFilterSelect"></select>
           </div>
         </div>
-        <div class="flex advanced-actions">
-          <button type="button" id="simpleModeBtn">Simplify to common verbs</button>
-          <button type="button" class="secondary" id="showAllVerbsBtn">Show every verb</button>
-        </div>
       </details>
     </section>
 
-    <section aria-labelledby="verb-table">
-      <h2 id="verb-table"><span>2</span>Explore the verbs</h2>
-      <p>
-        Select verbs to include in your quiz, play the pronunciation, and keep an eye on the accuracy color-coding.
-        Green indicates a strong verb, gray is neutral, and red signals a verb to review soon.
-      </p>
+    <section aria-label="Verb table">
+      <h2 id="verb-table" class="sr-only">Verb table</h2>
       <div class="flex" style="justify-content: space-between;">
         <div class="flex">
           <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
           <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
         </div>
         <div class="flex selection-summary">
-          <span class="selection-arrow" aria-hidden="true">&rsaquo;&rsaquo;&rsaquo;</span>
           <span class="selection-text">Selected for quiz</span>
           <span id="selectionCount" class="selection-count">0</span>
-          <span class="selection-arrow" aria-hidden="true">&rsaquo;&rsaquo;&rsaquo;&rsaquo;</span>
         </div>
       </div>
       <div style="overflow-x: auto;">
@@ -584,7 +562,7 @@
     </section>
 
     <section aria-labelledby="quiz-section">
-      <h2 id="quiz-section"><span>3</span>Practice &amp; quiz</h2>
+      <h2 id="quiz-section">Practice &amp; quiz</h2>
       <div class="quiz-card">
         <p class="quiz-description">
           Use the tracked practice to save your results for next time, or open the flashcards for a quick review with no
@@ -635,7 +613,7 @@
     </section>
 
     <section aria-labelledby="progress-section">
-      <h2 id="progress-section"><span>4</span>Progress &amp; review</h2>
+      <h2 id="progress-section">Progress &amp; review</h2>
       <div class="controls-grid">
         <div>
           <label>Total verbs in curriculum</label>
@@ -906,8 +884,6 @@
     const frequencyFilterSelect = document.getElementById("frequencyFilterSelect");
     const themeFilterSelect = document.getElementById("themeFilterSelect");
     const patternFilterSelect = document.getElementById("patternFilterSelect");
-    const simpleModeBtn = document.getElementById("simpleModeBtn");
-    const showAllVerbsBtn = document.getElementById("showAllVerbsBtn");
     const playAllBtn = document.getElementById("playAllBtn");
     const studyModeStatus = document.getElementById("studyModeStatus");
     const flashcardPane = document.getElementById("flashcardPane");
@@ -1478,21 +1454,6 @@
     });
 
     searchInput.addEventListener("input", () => {
-      applyFilters();
-    });
-
-    simpleModeBtn.addEventListener("click", () => {
-      resetToDefaultView();
-      const container = simpleModeBtn.closest("details");
-      if (container) {
-        container.open = false;
-      }
-    });
-
-    showAllVerbsBtn.addEventListener("click", () => {
-      frequencyFilterSelect.value = "";
-      themeFilterSelect.value = "";
-      patternFilterSelect.value = "";
       applyFilters();
     });
 
