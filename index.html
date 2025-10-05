@@ -167,40 +167,71 @@
       box-shadow: none;
     }
 
-    .study-mode-grid {
-      display: grid;
+    .study-actions {
+      display: flex;
+      flex-wrap: wrap;
       gap: 0.75rem;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       margin-top: 0.75rem;
+      align-items: center;
     }
 
-    button.study-mode-button {
-      background: white;
-      color: inherit;
-      border: 1px solid rgba(37, 99, 235, 0.35);
+    .study-play-button {
+      width: auto;
+      padding: 0.75rem 1.25rem;
       border-radius: 14px;
-      padding: 0.9rem 1rem;
-      text-align: left;
+    }
+
+    .dark-mode-control {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
-      box-shadow: none;
+      gap: 0.35rem;
+      align-items: flex-start;
+      justify-content: flex-start;
     }
 
-    button.study-mode-button span {
-      font-weight: 400;
-      font-size: 0.95rem;
-      opacity: 0.85;
+    .selection-summary {
+      justify-content: flex-end;
+      font-weight: 600;
+      gap: 0.35rem;
     }
 
-    button.study-mode-button:hover,
-    button.study-mode-button:focus-visible {
-      transform: translateY(-2px);
-      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    .selection-arrow {
+      color: var(--accent);
+      font-size: 1rem;
+      letter-spacing: 0.15em;
     }
 
-    body.dark button.study-mode-button {
-      background: rgba(17, 24, 39, 0.92);
+    .selection-count {
+      font-size: 1.1rem;
+    }
+
+    body.dark .selection-arrow {
+      color: #bfdbfe;
+    }
+
+    button.icon-button {
+      width: 2.75rem;
+      height: 2.75rem;
+      min-width: 2.75rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      font-size: 1.35rem;
+      background: rgba(37, 99, 235, 0.12);
+      color: var(--accent);
+    }
+
+    button.icon-button:hover,
+    button.icon-button:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+    }
+
+    body.dark button.icon-button {
+      background: rgba(59, 130, 246, 0.18);
+      color: #e2e8f0;
       border: 1px solid rgba(226, 232, 240, 0.25);
     }
 
@@ -476,39 +507,24 @@
       <div class="controls-grid">
         <div>
           <p style="margin: 0; font-weight: 600;">Start with the curated common verbs.</p>
-          <div class="study-mode-grid">
-            <button type="button" id="readModeBtn" class="study-mode-button">
-              Read the list
-              <span>Review the verbs visually below.</span>
-            </button>
-            <button type="button" id="listenModeBtn" class="study-mode-button">
-              Listen &amp; repeat
-              <span>Hear each verb with its key forms.</span>
-            </button>
-            <button type="button" id="practiceModeBtn" class="study-mode-button">
-              Practice common verbs
-              <span>Open flashcards with the most frequent verbs.</span>
-            </button>
+          <div class="study-actions">
+            <button type="button" id="playAllBtn" class="study-play-button">Play all pronunciations</button>
           </div>
           <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
-        </div>
-        <div>
-          <label for="voiceSelect">Voice for text-to-speech</label>
-          <select id="voiceSelect">
-            <option value="">Auto (best available)</option>
-          </select>
         </div>
         <div>
           <label for="searchInput">Quick search</label>
           <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
         </div>
-        <div>
-          <label for="darkModeToggle">Display style</label>
-          <button id="darkModeToggle" type="button" class="secondary">Toggle dark mode</button>
+        <div class="dark-mode-control">
+          <label class="sr-only" for="darkModeToggle">Toggle dark mode</label>
+          <button id="darkModeToggle" type="button" class="icon-button" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span aria-hidden="true">🌙</span>
+          </button>
         </div>
       </div>
       <details class="advanced-options">
-        <summary>Advanced options</summary>
+        <summary>More verbs</summary>
         <p style="margin: 0.5rem 0 0;">Fine-tune the list with filters or restore the simplified view.</p>
         <div class="controls-grid">
           <div>
@@ -542,8 +558,11 @@
           <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
           <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
         </div>
-        <div class="flex" style="font-weight: 600;">
-          <span>Selected for quiz: <span id="selectionCount">0</span></span>
+        <div class="flex selection-summary">
+          <span class="selection-arrow" aria-hidden="true">&rsaquo;&rsaquo;&rsaquo;</span>
+          <span class="selection-text">Selected for quiz</span>
+          <span id="selectionCount" class="selection-count">0</span>
+          <span class="selection-arrow" aria-hidden="true">&rsaquo;&rsaquo;&rsaquo;&rsaquo;</span>
         </div>
       </div>
       <div style="overflow-x: auto;">
@@ -857,11 +876,11 @@
     let quizIndex = 0;
     let currentQuestion = null;
     let voices = [];
+    let preferredVoice = null;
     let flashcardQueue = [];
     let flashcardIndex = 0;
     let listenTimeouts = [];
 
-    const voiceSelect = document.getElementById("voiceSelect");
     const verbTable = document.getElementById("verbTable");
     const searchInput = document.getElementById("searchInput");
     const selectionCount = document.getElementById("selectionCount");
@@ -889,9 +908,7 @@
     const patternFilterSelect = document.getElementById("patternFilterSelect");
     const simpleModeBtn = document.getElementById("simpleModeBtn");
     const showAllVerbsBtn = document.getElementById("showAllVerbsBtn");
-    const readModeBtn = document.getElementById("readModeBtn");
-    const listenModeBtn = document.getElementById("listenModeBtn");
-    const practiceModeBtn = document.getElementById("practiceModeBtn");
+    const playAllBtn = document.getElementById("playAllBtn");
     const studyModeStatus = document.getElementById("studyModeStatus");
     const flashcardPane = document.getElementById("flashcardPane");
     const flashcardPrompt = document.getElementById("flashcardPrompt");
@@ -1017,7 +1034,7 @@
       const verbsToPlay = getFilteredVerbs().slice(0, 12);
       if (!verbsToPlay.length) {
         if (studyModeStatus) {
-          studyModeStatus.textContent = "No verbs available to listen to. Adjust your filters in Advanced options.";
+          studyModeStatus.textContent = "No verbs available to listen to. Adjust your filters in More verbs.";
         }
         return;
       }
@@ -1105,12 +1122,11 @@
     function speakIfRequested(text) {
       if (!text) return;
       const utterance = new SpeechSynthesisUtterance(text);
-      const selectedId = voiceSelect.value;
-      if (selectedId) {
-        const voice = voices.find((v) => v.voiceURI === selectedId);
-        if (voice) {
-          utterance.voice = voice;
-        }
+      if (!preferredVoice && voices.length) {
+        preferredVoice = choosePreferredVoice(voices);
+      }
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
       }
       utterance.rate = 0.95;
       window.speechSynthesis.cancel();
@@ -1454,32 +1470,11 @@
       setTimeout(() => (quizResult.style.display = "none"), 1800);
     });
 
-    readModeBtn.addEventListener("click", () => {
-      resetToDefaultView();
-      stopListeningSequence();
-      if (studyModeStatus) {
-        studyModeStatus.textContent = "Scroll through the verbs below to read them at your own pace.";
-      }
-      endFlashcardPractice({ silent: true });
-      document.getElementById("verb-table").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
-    listenModeBtn.addEventListener("click", () => {
+    playAllBtn.addEventListener("click", () => {
       resetToDefaultView();
       endFlashcardPractice({ silent: true });
       startListeningToCurrentList();
       document.getElementById("verb-table").scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
-    practiceModeBtn.addEventListener("click", () => {
-      resetToDefaultView();
-      stopListeningSequence();
-      if (!verbs.length) return;
-      startFlashcardPractice();
-      document.getElementById("quiz-section").scrollIntoView({ behavior: "smooth", block: "start" });
-      if (studyModeStatus) {
-        studyModeStatus.textContent = "Flashcard practice opened with the common verbs.";
-      }
     });
 
     searchInput.addEventListener("input", () => {
@@ -1553,22 +1548,35 @@
       });
     }
 
+    function choosePreferredVoice(list) {
+      if (!list.length) return null;
+      const googleUsEnglish = list.find((voice) => voice.lang === "en-US" && /google us english/i.test(voice.name));
+      if (googleUsEnglish) return googleUsEnglish;
+      const googleEnglish = list.find((voice) => voice.lang.startsWith("en") && /google/i.test(voice.name));
+      if (googleEnglish) return googleEnglish;
+      const americanEnglish = list.find((voice) => voice.lang === "en-US");
+      if (americanEnglish) return americanEnglish;
+      const anyEnglish = list.find((voice) => voice.lang.startsWith("en"));
+      return anyEnglish || list[0];
+    }
+
     function initVoices() {
       function populateVoices() {
         voices = window.speechSynthesis.getVoices().filter((voice) => voice.lang.startsWith("en"));
-        voiceSelect.innerHTML = '<option value="">Auto (best available)</option>';
-        voices.forEach((voice) => {
-          const option = document.createElement("option");
-          option.value = voice.voiceURI;
-          option.textContent = `${voice.name} (${voice.lang})`;
-          if (voice.lang === "en-US" && !voiceSelect.value) {
-            option.selected = true;
-          }
-          voiceSelect.appendChild(option);
-        });
+        preferredVoice = choosePreferredVoice(voices);
       }
       populateVoices();
       window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+
+    function updateDarkModeButton() {
+      if (!darkModeToggle) return;
+      const isDark = document.body.classList.contains("dark");
+      const icon = isDark ? "☀️" : "🌙";
+      const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+      darkModeToggle.innerHTML = `<span aria-hidden="true">${icon}</span>`;
+      darkModeToggle.setAttribute("aria-label", label);
+      darkModeToggle.setAttribute("title", label);
     }
 
     function restoreDarkMode() {
@@ -1576,12 +1584,14 @@
       if (stored === "dark") {
         document.body.classList.add("dark");
       }
+      updateDarkModeButton();
     }
 
     darkModeToggle.addEventListener("click", () => {
       document.body.classList.toggle("dark");
       const mode = document.body.classList.contains("dark") ? "dark" : "light";
       localStorage.setItem("irregularVerbCoachTheme", mode);
+      updateDarkModeButton();
     });
 
     document.addEventListener("DOMContentLoaded", () => {
