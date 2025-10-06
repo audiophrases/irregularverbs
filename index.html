@@ -383,6 +383,17 @@
       gap: 0.5rem;
     }
 
+    .advanced-options summary .disclosure-icon {
+      font-size: 0.8rem;
+      transition: transform 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .advanced-options[open] .disclosure-icon {
+      transform: rotate(-180deg);
+    }
+
     .advanced-options .controls-grid {
       margin-top: 1rem;
     }
@@ -513,7 +524,7 @@
         </div>
       </div>
       <details class="advanced-options">
-        <summary>More verbs</summary>
+        <summary><span class="disclosure-icon" aria-hidden="true">▾</span>More verbs</summary>
         <div class="controls-grid">
           <div>
             <label for="frequencyFilterSelect">Filter by frequency</label>
@@ -836,6 +847,26 @@
     );
 
     const STORAGE_KEY = "irregularVerbProgress_v1";
+    const themeGroupMap = {
+      "Actions & Impact": "Action & Motion",
+      "Communication": "Communication & Decisions",
+      "Creation": "Creation & Commerce",
+      "Daily Routines": "Daily Life & Health",
+      "Decisions": "Communication & Decisions",
+      "Emotion & Thought": "Emotion & Perception",
+      "Health": "Daily Life & Health",
+      "Movement": "Action & Motion",
+      "Nature & Forces": "Nature & Environment",
+      "Perception": "Emotion & Perception",
+      "States & Being": "Emotion & Perception",
+      "Transactions": "Creation & Commerce"
+    };
+
+    verbs.forEach((verb) => {
+      if (themeGroupMap[verb.theme]) {
+        verb.theme = themeGroupMap[verb.theme];
+      }
+    });
     const frequencyOrder = ["Common", "Less common", "Least common"];
     const patternOrder = [
       "No change — 25",
