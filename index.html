@@ -507,9 +507,6 @@
       <h2 id="study-controls" class="sr-only">Study controls</h2>
       <div class="controls-grid">
         <div>
-          <div class="study-actions">
-            <button type="button" id="playAllBtn" class="study-play-button">🗣️ Play all</button>
-          </div>
           <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
         </div>
         <div>
@@ -550,8 +547,9 @@
           <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
         </div>
         <div class="flex selection-summary">
-          <span class="selection-text">Selected for quiz</span>
+          <span class="selection-text">Selected for quiz:</span>
           <span id="selectionCount" class="selection-count">0</span>
+          <button type="button" id="playAllBtn" class="study-play-button">🔊 Play selected</button>
         </div>
       </div>
       <div style="overflow-x: auto;">
@@ -916,6 +914,9 @@
     const themeFilterSelect = document.getElementById("themeFilterSelect");
     const patternFilterSelect = document.getElementById("patternFilterSelect");
     const playAllBtn = document.getElementById("playAllBtn");
+    if (playAllBtn) {
+      playAllBtn.disabled = true;
+    }
     const studyModeStatus = document.getElementById("studyModeStatus");
     const flashcardPane = document.getElementById("flashcardPane");
     const flashcardPrompt = document.getElementById("flashcardPrompt");
@@ -1026,6 +1027,34 @@
         });
     }
 
+    function getSelectedVerbs() {
+      if (!selectionSet.size) {
+        return [];
+      }
+
+      const filtered = getFilteredVerbs();
+      const selectedBases = new Set(selectionSet);
+      const orderedSelection = [];
+
+      filtered.forEach((verb) => {
+        if (selectedBases.has(verb.base)) {
+          orderedSelection.push(verb);
+          selectedBases.delete(verb.base);
+        }
+      });
+
+      if (selectedBases.size) {
+        verbs.forEach((verb) => {
+          if (selectedBases.has(verb.base)) {
+            orderedSelection.push(verb);
+            selectedBases.delete(verb.base);
+          }
+        });
+      }
+
+      return orderedSelection;
+    }
+
     function stopListeningSequence() {
       listenTimeouts.forEach((timeout) => clearTimeout(timeout));
       listenTimeouts = [];
@@ -1037,11 +1066,11 @@
       renderVerbTable(getFilteredVerbs());
     }
 
-    function startListeningToCurrentList() {
-      const verbsToPlay = getFilteredVerbs().slice(0, 12);
+    function startListeningToSelectedVerbs() {
+      const verbsToPlay = getSelectedVerbs();
       if (!verbsToPlay.length) {
         if (studyModeStatus) {
-          studyModeStatus.textContent = "No verbs available to listen to. Adjust your filters in More verbs.";
+          studyModeStatus.textContent = "No verbs selected to listen to yet. Choose verbs in the table first.";
         }
         return;
       }
@@ -1049,7 +1078,7 @@
       stopListeningSequence();
 
       if (studyModeStatus) {
-        studyModeStatus.textContent = `Listening through ${verbsToPlay.length} verb${verbsToPlay.length === 1 ? "" : "s"}.`;
+        studyModeStatus.textContent = `Listening through ${verbsToPlay.length} selected verb${verbsToPlay.length === 1 ? "" : "s"}.`;
       }
 
       let delay = 0;
@@ -1073,7 +1102,7 @@
 
       listenTimeouts.push(setTimeout(() => {
         if (studyModeStatus) {
-          studyModeStatus.textContent = `Finished listening to ${verbsToPlay.length} verb${verbsToPlay.length === 1 ? "" : "s"}.`;
+          studyModeStatus.textContent = `Finished listening to ${verbsToPlay.length} selected verb${verbsToPlay.length === 1 ? "" : "s"}.`;
         }
       }, delay));
     }
@@ -1123,7 +1152,11 @@
     }
 
     function updateSelectionCount() {
-      selectionCount.textContent = selectionSet.size;
+      const count = selectionSet.size;
+      selectionCount.textContent = count;
+      if (playAllBtn) {
+        playAllBtn.disabled = count === 0;
+      }
     }
 
     function speakIfRequested(text) {
@@ -1478,9 +1511,8 @@
     });
 
     playAllBtn.addEventListener("click", () => {
-      resetToDefaultView();
       endFlashcardPractice({ silent: true });
-      startListeningToCurrentList();
+      startListeningToSelectedVerbs();
       document.getElementById("verb-table").scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
