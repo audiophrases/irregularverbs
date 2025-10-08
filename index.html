@@ -1318,7 +1318,9 @@
     function stopListeningSequence() {
       listenTimeouts.forEach((timeout) => clearTimeout(timeout));
       listenTimeouts = [];
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis && typeof window.speechSynthesis.cancel === "function") {
+        window.speechSynthesis.cancel();
+      }
     }
 
     function applyFilters() {
@@ -1425,6 +1427,14 @@
 
     function speakIfRequested(text) {
       if (!text) return;
+      const synthesis = window.speechSynthesis;
+      if (
+        !synthesis ||
+        typeof synthesis.speak !== "function" ||
+        typeof window.SpeechSynthesisUtterance !== "function"
+      ) {
+        return;
+      }
       const utterance = new SpeechSynthesisUtterance(text);
       if (!preferredVoice && voices.length) {
         preferredVoice = choosePreferredVoice(voices);
@@ -1433,8 +1443,10 @@
         utterance.voice = preferredVoice;
       }
       utterance.rate = 0.95;
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.speak(utterance);
+      if (typeof synthesis.cancel === "function") {
+        synthesis.cancel();
+      }
+      synthesis.speak(utterance);
     }
 
     function handleTableInteraction(event) {
@@ -1857,12 +1869,27 @@
     }
 
     function initVoices() {
+      const synthesis = window.speechSynthesis;
+      if (!synthesis || typeof synthesis.getVoices !== "function") {
+        voices = [];
+        preferredVoice = null;
+        return;
+      }
+
       function populateVoices() {
-        voices = window.speechSynthesis.getVoices().filter((voice) => voice.lang.startsWith("en"));
+        voices = synthesis
+          .getVoices()
+          .filter((voice) => voice.lang && voice.lang.startsWith("en"));
         preferredVoice = choosePreferredVoice(voices);
       }
+
       populateVoices();
-      window.speechSynthesis.onvoiceschanged = populateVoices;
+
+      if (typeof synthesis.addEventListener === "function") {
+        synthesis.addEventListener("voiceschanged", populateVoices);
+      } else if ("onvoiceschanged" in synthesis) {
+        synthesis.onvoiceschanged = populateVoices;
+      }
     }
 
     function updateDarkModeButton() {
