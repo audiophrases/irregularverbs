@@ -641,7 +641,7 @@
           aria-controls="verbs-panel"
           data-tab-target="verbs-panel"
         >
-          <span class="tab-title">Verb explorer</span>
+          <span class="tab-title">Explore &amp; study</span>
           <span class="tab-subtitle">Browse, filter &amp; listen</span>
         </button>
         <button
@@ -683,10 +683,6 @@
             <div>
               <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
             </div>
-            <div>
-              <label for="searchInput">Quick search</label>
-              <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
-            </div>
           </div>
           <details class="advanced-options">
             <summary><span class="disclosure-icon" aria-hidden="true">▾</span>More verbs</summary>
@@ -709,6 +705,12 @@
 
         <section aria-label="Verb table">
           <h2 id="verb-table" class="sr-only">Verb table</h2>
+          <div class="controls-grid" style="margin-bottom: 1rem;">
+            <div>
+              <label for="searchInput">Quick search</label>
+              <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
+            </div>
+          </div>
           <div class="flex" style="justify-content: space-between;">
             <div class="flex">
               <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
