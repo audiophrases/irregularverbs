@@ -67,6 +67,116 @@
       box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
     }
 
+    .tabbed-workspace {
+      margin-top: 2rem;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 0.5rem;
+      border-radius: 999px;
+      position: sticky;
+      top: 1rem;
+      z-index: 10;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    body.dark .tab-nav {
+      background: rgba(15, 23, 42, 0.85);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .tab-button {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: inherit;
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.2rem;
+    }
+
+    .tab-button .tab-title {
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .tab-button .tab-subtitle {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    body.dark .tab-button .tab-subtitle {
+      color: #cbd5f5;
+      opacity: 0.85;
+    }
+
+    .tab-button:hover,
+    .tab-button:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(47, 125, 225, 0.12);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.22);
+      outline: none;
+    }
+
+    body.dark .tab-button:hover,
+    body.dark .tab-button:focus-visible {
+      background: rgba(59, 130, 246, 0.2);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+    }
+
+    .tab-button[aria-selected="true"] {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+    }
+
+    .tab-button[aria-selected="true"] .tab-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .tab-panel {
+      margin-top: 1.5rem;
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    .tab-panel > section:first-of-type {
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .tab-nav {
+        border-radius: 18px;
+        padding: 0.4rem 0.5rem;
+      }
+
+      .tab-button {
+        flex: 1 1 100%;
+        border-radius: 14px;
+        align-items: center;
+      }
+
+      .tab-button .tab-subtitle {
+        text-align: center;
+      }
+    }
+
     h2 {
       margin-top: 0;
       font-size: 1.5rem;
@@ -503,146 +613,219 @@
   </header>
 
   <main>
-    <section aria-label="Study controls">
-      <h2 id="study-controls" class="sr-only">Study controls</h2>
-      <div class="controls-grid">
-        <div>
-          <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
-        </div>
-        <div>
-          <label for="searchInput">Quick search</label>
-          <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
-        </div>
-        <div class="dark-mode-control">
-          <label class="sr-only" for="darkModeToggle">Toggle dark mode</label>
-          <button id="darkModeToggle" type="button" class="icon-button" aria-label="Toggle dark mode" title="Toggle dark mode">
-            <span aria-hidden="true">🌙</span>
-          </button>
-        </div>
+    <section class="tabbed-workspace" aria-label="Learning workspace">
+      <div class="tab-nav" role="tablist" aria-label="Workspace sections" aria-orientation="horizontal">
+        <button
+          type="button"
+          id="verbs-tab"
+          class="tab-button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="verbs-panel"
+          data-tab-target="verbs-panel"
+        >
+          <span class="tab-title">Verb explorer</span>
+          <span class="tab-subtitle">Browse, filter &amp; listen</span>
+        </button>
+        <button
+          type="button"
+          id="practice-tab"
+          class="tab-button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="practice-panel"
+          data-tab-target="practice-panel"
+        >
+          <span class="tab-title">Practice &amp; quiz</span>
+          <span class="tab-subtitle" id="tabSelectionSummary">No verbs selected yet</span>
+        </button>
+        <button
+          type="button"
+          id="progress-tab"
+          class="tab-button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="progress-panel"
+          data-tab-target="progress-panel"
+        >
+          <span class="tab-title">Progress &amp; review</span>
+          <span class="tab-subtitle" id="tabProgressSummary">0 of 0 studied</span>
+        </button>
       </div>
-      <details class="advanced-options">
-        <summary><span class="disclosure-icon" aria-hidden="true">▾</span>More verbs</summary>
-        <div class="controls-grid">
-          <div>
-            <label for="frequencyFilterSelect">Filter by frequency</label>
-            <select id="frequencyFilterSelect"></select>
-          </div>
-          <div>
-            <label for="themeFilterSelect">Filter by theme</label>
-            <select id="themeFilterSelect"></select>
-          </div>
-          <div>
-            <label for="patternFilterSelect">Filter by pattern</label>
-            <select id="patternFilterSelect"></select>
-          </div>
-        </div>
-      </details>
-    </section>
 
-    <section aria-label="Verb table">
-      <h2 id="verb-table" class="sr-only">Verb table</h2>
-      <div class="flex" style="justify-content: space-between;">
-        <div class="flex">
-          <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
-          <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
-        </div>
-        <div class="flex selection-summary">
-          <span class="selection-text">Selected for quiz:</span>
-          <span id="selectionCount" class="selection-count">0</span>
-          <button type="button" id="playAllBtn" class="study-play-button">🔊 Play selected</button>
-        </div>
-      </div>
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col"><span class="sr-only">Select for quiz</span></th>
-              <th scope="col">Base</th>
-              <th scope="col">Past</th>
-              <th scope="col">Past Participle</th>
-              <th scope="col">Catalan</th>
-              <th scope="col">Progress</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="verbTable"></tbody>
-        </table>
-      </div>
-    </section>
+      <div
+        id="verbs-panel"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="verbs-tab"
+        data-tab-panel
+      >
+        <section aria-label="Study controls">
+          <h2 id="study-controls" class="sr-only">Study controls</h2>
+          <div class="controls-grid">
+            <div>
+              <div id="studyModeStatus" class="study-mode-status" aria-live="polite"></div>
+            </div>
+            <div>
+              <label for="searchInput">Quick search</label>
+              <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
+            </div>
+            <div class="dark-mode-control">
+              <label class="sr-only" for="darkModeToggle">Toggle dark mode</label>
+              <button
+                id="darkModeToggle"
+                type="button"
+                class="icon-button"
+                aria-label="Toggle dark mode"
+                title="Toggle dark mode"
+              >
+                <span aria-hidden="true">🌙</span>
+              </button>
+            </div>
+          </div>
+          <details class="advanced-options">
+            <summary><span class="disclosure-icon" aria-hidden="true">▾</span>More verbs</summary>
+            <div class="controls-grid">
+              <div>
+                <label for="frequencyFilterSelect">Filter by frequency</label>
+                <select id="frequencyFilterSelect"></select>
+              </div>
+              <div>
+                <label for="themeFilterSelect">Filter by theme</label>
+                <select id="themeFilterSelect"></select>
+              </div>
+              <div>
+                <label for="patternFilterSelect">Filter by pattern</label>
+                <select id="patternFilterSelect"></select>
+              </div>
+            </div>
+          </details>
+        </section>
 
-    <section aria-labelledby="quiz-section">
-      <h2 id="quiz-section">Practice &amp; quiz</h2>
-      <div class="quiz-card">
-        <p class="quiz-description">
-          Use the tracked practice to save your results for next time, or open the flashcards for a quick review with no
-          progress tracking.
-        </p>
-        <div class="controls-grid">
-          <div>
-            <label for="questionCount">Number of questions</label>
-            <input type="number" id="questionCount" min="3" max="50" value="10" />
+        <section aria-label="Verb table">
+          <h2 id="verb-table" class="sr-only">Verb table</h2>
+          <div class="flex" style="justify-content: space-between;">
+            <div class="flex">
+              <button type="button" class="secondary" id="selectAllBtn">Select all in view</button>
+              <button type="button" class="secondary" id="clearSelectionBtn">Clear selection</button>
+            </div>
+            <div class="flex selection-summary">
+              <span class="selection-text">Selected for quiz:</span>
+              <span id="selectionCount" class="selection-count">0</span>
+              <button type="button" id="playAllBtn" class="study-play-button">🔊 Play selected</button>
+            </div>
           </div>
-          <div>
-            <label for="quizMode">Quiz focus</label>
-            <select id="quizMode">
-              <option value="mixed">Mix of forms &amp; translations</option>
-              <option value="forms">English forms only</option>
-              <option value="translation">Catalan to English</option>
-            </select>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col"><span class="sr-only">Select for quiz</span></th>
+                  <th scope="col">Base</th>
+                  <th scope="col">Past</th>
+                  <th scope="col">Past Participle</th>
+                  <th scope="col">Catalan</th>
+                  <th scope="col">Progress</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="verbTable"></tbody>
+            </table>
           </div>
-        </div>
-        <div class="flex quiz-actions">
-          <div class="flex">
-            <button type="button" id="startQuizBtn">Start tracked practice</button>
-            <button type="button" class="secondary" id="startPracticeBtn">Flashcard practice (no save)</button>
-          </div>
-          <button type="button" class="secondary" id="resetProgressBtn">Reset saved progress</button>
-        </div>
-        <div class="quiz-status" id="quizStatus" aria-live="polite"></div>
-        <div class="quiz-result" id="quizResult" role="alert"></div>
-        <div id="quizPane" style="display: none;">
-          <h3 id="quizPrompt"></h3>
-          <form id="quizForm"></form>
-          <div class="flex">
-            <button type="submit" form="quizForm">Check answer</button>
-            <button type="button" class="secondary" id="skipQuestionBtn">Skip</button>
-          </div>
-        </div>
-        <div id="flashcardPane" class="flashcard-pane" style="display: none;">
-          <h3 id="flashcardPrompt"></h3>
-          <p id="flashcardHint"></p>
-          <div id="flashcardAnswer" hidden></div>
-          <div class="flex">
-            <button type="button" id="revealFlashcardBtn">Reveal answer</button>
-            <button type="button" class="secondary" id="nextFlashcardBtn">Next card</button>
-            <button type="button" class="secondary" id="closeFlashcardBtn">Close practice</button>
-          </div>
-        </div>
+        </section>
       </div>
-    </section>
 
-    <section aria-labelledby="progress-section">
-      <h2 id="progress-section">Progress &amp; review</h2>
-      <div class="controls-grid">
-        <div>
-          <label>Total verbs in curriculum</label>
-          <div id="totalVerbs">0</div>
-        </div>
-        <div>
-          <label>Studied verbs</label>
-          <div id="studiedVerbs">0</div>
-        </div>
-        <div>
-          <label>Average accuracy</label>
-          <div id="averageAccuracy">0%</div>
-        </div>
-        <div>
-          <label>Last review session</label>
-          <div id="lastReviewed">—</div>
-        </div>
+      <div
+        id="practice-panel"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="practice-tab"
+        data-tab-panel
+        hidden
+      >
+        <section aria-labelledby="quiz-section">
+          <h2 id="quiz-section">Practice &amp; quiz</h2>
+          <div class="quiz-card">
+            <p class="quiz-description">
+              Use the tracked practice to save your results for next time, or open the flashcards for a quick review with no
+              progress tracking.
+            </p>
+            <div class="controls-grid">
+              <div>
+                <label for="questionCount">Number of questions</label>
+                <input type="number" id="questionCount" min="3" max="50" value="10" />
+              </div>
+              <div>
+                <label for="quizMode">Quiz focus</label>
+                <select id="quizMode">
+                  <option value="mixed">Mix of forms &amp; translations</option>
+                  <option value="forms">English forms only</option>
+                  <option value="translation">Catalan to English</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex quiz-actions">
+              <div class="flex">
+                <button type="button" id="startQuizBtn">Start tracked practice</button>
+                <button type="button" class="secondary" id="startPracticeBtn">Flashcard practice (no save)</button>
+              </div>
+              <button type="button" class="secondary" id="resetProgressBtn">Reset saved progress</button>
+            </div>
+            <div class="quiz-status" id="quizStatus" aria-live="polite"></div>
+            <div class="quiz-result" id="quizResult" role="alert"></div>
+            <div id="quizPane" style="display: none;">
+              <h3 id="quizPrompt"></h3>
+              <form id="quizForm"></form>
+              <div class="flex">
+                <button type="submit" form="quizForm">Check answer</button>
+                <button type="button" class="secondary" id="skipQuestionBtn">Skip</button>
+              </div>
+            </div>
+            <div id="flashcardPane" class="flashcard-pane" style="display: none;">
+              <h3 id="flashcardPrompt"></h3>
+              <p id="flashcardHint"></p>
+              <div id="flashcardAnswer" hidden></div>
+              <div class="flex">
+                <button type="button" id="revealFlashcardBtn">Reveal answer</button>
+                <button type="button" class="secondary" id="nextFlashcardBtn">Next card</button>
+                <button type="button" class="secondary" id="closeFlashcardBtn">Close practice</button>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-      <h3>Hard verbs to review</h3>
-      <div id="hardVerbs" class="hard-list"></div>
+
+      <div
+        id="progress-panel"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="progress-tab"
+        data-tab-panel
+        hidden
+      >
+        <section aria-labelledby="progress-section">
+          <h2 id="progress-section">Progress &amp; review</h2>
+          <div class="controls-grid">
+            <div>
+              <label>Total verbs in curriculum</label>
+              <div id="totalVerbs">0</div>
+            </div>
+            <div>
+              <label>Studied verbs</label>
+              <div id="studiedVerbs">0</div>
+            </div>
+            <div>
+              <label>Average accuracy</label>
+              <div id="averageAccuracy">0%</div>
+            </div>
+            <div>
+              <label>Last review session</label>
+              <div id="lastReviewed">—</div>
+            </div>
+          </div>
+          <h3>Hard verbs to review</h3>
+          <div id="hardVerbs" class="hard-list"></div>
+        </section>
+      </div>
     </section>
   </main>
 
@@ -925,6 +1108,71 @@
     const revealFlashcardBtn = document.getElementById("revealFlashcardBtn");
     const nextFlashcardBtn = document.getElementById("nextFlashcardBtn");
     const closeFlashcardBtn = document.getElementById("closeFlashcardBtn");
+    const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
+    const tabPanels = Array.from(document.querySelectorAll("[data-tab-panel]"));
+    const tabSelectionSummary = document.getElementById("tabSelectionSummary");
+    const tabProgressSummary = document.getElementById("tabProgressSummary");
+    const workspaceSection = document.querySelector(".tabbed-workspace");
+    const prefersReducedMotion = window.matchMedia
+      ? window.matchMedia("(prefers-reduced-motion: reduce)")
+      : { matches: false };
+
+    if (tabButtons.length && tabPanels.length) {
+      function activateTab(targetId, { shouldScroll = false } = {}) {
+        tabButtons.forEach((button) => {
+          const isActive = button.dataset.tabTarget === targetId;
+          button.setAttribute("aria-selected", isActive ? "true" : "false");
+          button.tabIndex = isActive ? 0 : -1;
+        });
+
+        tabPanels.forEach((panel) => {
+          const isActive = panel.id === targetId;
+          panel.hidden = !isActive;
+        });
+
+        if (shouldScroll && workspaceSection) {
+          workspaceSection.scrollIntoView({
+            behavior: prefersReducedMotion.matches ? "auto" : "smooth",
+            block: "start",
+          });
+        }
+      }
+
+      tabButtons.forEach((button, index) => {
+        button.tabIndex = button.getAttribute("aria-selected") === "true" ? 0 : -1;
+        button.addEventListener("click", () => {
+          activateTab(button.dataset.tabTarget, { shouldScroll: true });
+        });
+
+        button.addEventListener("keydown", (event) => {
+          if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+          event.preventDefault();
+
+          if (event.key === "Home") {
+            const first = tabButtons[0];
+            first.focus();
+            activateTab(first.dataset.tabTarget, { shouldScroll: true });
+            return;
+          }
+
+          if (event.key === "End") {
+            const last = tabButtons[tabButtons.length - 1];
+            last.focus();
+            activateTab(last.dataset.tabTarget, { shouldScroll: true });
+            return;
+          }
+
+          const direction = event.key === "ArrowRight" ? 1 : -1;
+          const nextIndex = (index + direction + tabButtons.length) % tabButtons.length;
+          const nextButton = tabButtons[nextIndex];
+          nextButton.focus();
+          activateTab(nextButton.dataset.tabTarget, { shouldScroll: true });
+        });
+      });
+
+      const initiallySelected = tabButtons.find((button) => button.getAttribute("aria-selected") === "true");
+      activateTab(initiallySelected ? initiallySelected.dataset.tabTarget : tabButtons[0].dataset.tabTarget);
+    }
 
     const DEFAULT_FREQUENCY = "Common";
     const frequencyOptions = frequencyOrder.filter((option) => verbs.some((verb) => verb.frequency === option));
@@ -1154,6 +1402,10 @@
     function updateSelectionCount() {
       const count = selectionSet.size;
       selectionCount.textContent = count;
+      if (tabSelectionSummary) {
+        tabSelectionSummary.textContent =
+          count === 0 ? "No verbs selected yet" : `${count} ${count === 1 ? "verb" : "verbs"} selected`;
+      }
       if (playAllBtn) {
         playAllBtn.disabled = count === 0;
       }
@@ -1532,8 +1784,16 @@
       }, 0);
 
       studiedVerbsEl.textContent = studied;
-      averageAccuracyEl.textContent = totalAttempts ? formatPercent(accuracy) : "0%";
+      const accuracyText = totalAttempts ? formatPercent(accuracy) : "0%";
+      averageAccuracyEl.textContent = accuracyText;
       lastReviewedEl.textContent = lastTimestamp ? new Date(lastTimestamp).toLocaleString() : "—";
+      if (tabProgressSummary) {
+        const totalCurriculum = verbs.length;
+        const summaryText = `${studied} of ${totalCurriculum} studied${
+          totalAttempts ? ` · ${accuracyText}` : ""
+        }`;
+        tabProgressSummary.textContent = summaryText;
+      }
     }
 
     function renderHardVerbs() {
