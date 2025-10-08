@@ -37,8 +37,17 @@
       background: linear-gradient(135deg, #1d4ed8, #9333ea);
       color: white;
       padding: 2.5rem 1.5rem;
-      text-align: center;
       box-shadow: 0 8px 30px rgba(17, 24, 39, 0.25);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      flex-wrap: wrap;
     }
 
     header h1 {
@@ -46,6 +55,23 @@
       font-size: clamp(1.75rem, 4vw, 2.5rem);
       letter-spacing: 0.05em;
       text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .header-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .header-actions {
+        justify-content: center;
+      }
     }
 
     main {
@@ -76,19 +102,9 @@
       gap: 0.75rem;
       align-items: center;
       flex-wrap: wrap;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
-      padding: 0.5rem;
-      border-radius: 999px;
       position: sticky;
       top: 1rem;
       z-index: 10;
-      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
-    }
-
-    body.dark .tab-nav {
-      background: rgba(15, 23, 42, 0.85);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
     .tab-button {
@@ -161,11 +177,6 @@
     }
 
     @media (max-width: 768px) {
-      .tab-nav {
-        border-radius: 18px;
-        padding: 0.4rem 0.5rem;
-      }
-
       .tab-button {
         flex: 1 1 100%;
         border-radius: 14px;
@@ -289,14 +300,6 @@
       width: auto;
       padding: 0.75rem 1.25rem;
       border-radius: 14px;
-    }
-
-    .dark-mode-control {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      align-items: flex-start;
-      justify-content: flex-start;
     }
 
     .selection-summary {
@@ -609,7 +612,21 @@
 </head>
 <body>
   <header>
-    <h1>Irregular Verb Coach</h1>
+    <div class="header-inner">
+      <h1>Irregular Verb Coach</h1>
+      <div class="header-actions">
+        <label class="sr-only" for="darkModeToggle">Toggle dark mode</label>
+        <button
+          id="darkModeToggle"
+          type="button"
+          class="icon-button"
+          aria-label="Toggle dark mode"
+          title="Toggle dark mode"
+        >
+          <span aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -669,18 +686,6 @@
             <div>
               <label for="searchInput">Quick search</label>
               <input type="search" id="searchInput" placeholder="Search by verb or Catalan meaning" />
-            </div>
-            <div class="dark-mode-control">
-              <label class="sr-only" for="darkModeToggle">Toggle dark mode</label>
-              <button
-                id="darkModeToggle"
-                type="button"
-                class="icon-button"
-                aria-label="Toggle dark mode"
-                title="Toggle dark mode"
-              >
-                <span aria-hidden="true">🌙</span>
-              </button>
             </div>
           </div>
           <details class="advanced-options">
