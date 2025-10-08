@@ -1890,7 +1890,7 @@
       updateDarkModeButton();
     });
 
-    document.addEventListener("DOMContentLoaded", () => {
+    function initializeApp() {
       restoreDarkMode();
       initVoices();
       initializeFilterSelects();
@@ -1899,7 +1899,13 @@
       renderVerbTable(getFilteredVerbs());
       updateProgressSummary();
       renderHardVerbs();
-    });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initializeApp, { once: true });
+    } else {
+      initializeApp();
+    }
   </script>
 </body>
 </html>
