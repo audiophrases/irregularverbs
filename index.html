@@ -438,6 +438,22 @@
       margin-bottom: 0.25rem;
     }
 
+    #practice-panel .quiz-card {
+      font-size: 1.26rem;
+    }
+
+    #practice-panel #quizPrompt {
+      font-size: 1.62rem;
+    }
+
+    #practice-panel #quizForm label,
+    #practice-panel #quizForm input,
+    #practice-panel .quiz-result,
+    #practice-panel #flashcardPane,
+    #practice-panel #flashcardPane * {
+      font-size: 1.2rem;
+    }
+
     .quiz-description {
       margin: 0;
       color: #475569;
@@ -788,8 +804,9 @@
               <h3 id="quizPrompt"></h3>
               <form id="quizForm"></form>
               <div class="flex">
-                <button type="submit" form="quizForm">Check answer</button>
+                <button type="submit" form="quizForm" id="checkAnswerBtn">Check answer</button>
                 <button type="button" class="secondary" id="skipQuestionBtn">Skip</button>
+                <button type="button" class="secondary" id="nextQuestionBtn" disabled>Next question</button>
               </div>
             </div>
             <div id="flashcardPane" class="flashcard-pane" style="display: none;">
@@ -1082,6 +1099,7 @@
     let flashcardQueue = [];
     let flashcardIndex = 0;
     let listenTimeouts = [];
+    let awaitingAdvance = false;
 
     const verbTable = document.getElementById("verbTable");
     const searchInput = document.getElementById("searchInput");
@@ -1094,6 +1112,8 @@
     const quizPrompt = document.getElementById("quizPrompt");
     const quizForm = document.getElementById("quizForm");
     const skipQuestionBtn = document.getElementById("skipQuestionBtn");
+    const checkAnswerBtn = document.getElementById("checkAnswerBtn");
+    const nextQuestionBtn = document.getElementById("nextQuestionBtn");
     const questionCountInput = document.getElementById("questionCount");
     const quizModeSelect = document.getElementById("quizMode");
     const startQuizBtn = document.getElementById("startQuizBtn");
@@ -1506,6 +1526,24 @@
       };
     }
 
+    function updateQuizControls({ canSubmit, canSkip, canAdvance }) {
+      if (checkAnswerBtn) {
+        checkAnswerBtn.disabled = !canSubmit;
+      }
+      if (skipQuestionBtn) {
+        skipQuestionBtn.disabled = !canSkip;
+      }
+      if (nextQuestionBtn) {
+        nextQuestionBtn.disabled = !canAdvance;
+      }
+    }
+
+    function setQuizFormInputsDisabled(isDisabled) {
+      quizForm.querySelectorAll("input").forEach((input) => {
+        input.disabled = isDisabled;
+      });
+    }
+
     function prepareQuiz() {
       const requested = Number.parseInt(questionCountInput.value, 10) || 10;
       const selected = verbs.filter((verb) => selectionSet.has(verb.base));
@@ -1517,6 +1555,8 @@
       quizResult.style.display = "none";
       endFlashcardPractice({ silent: true });
       quizPane.style.display = "block";
+      awaitingAdvance = false;
+      updateQuizControls({ canSubmit: true, canSkip: true, canAdvance: false });
       renderQuizStatus();
       nextQuestion();
     }
@@ -1629,8 +1669,12 @@
         finishQuiz();
         return;
       }
+      awaitingAdvance = false;
+      updateQuizControls({ canSubmit: true, canSkip: true, canAdvance: false });
       currentQuestion = createQuestion(quizQueue[quizIndex]);
       buildQuizForm(currentQuestion);
+      setQuizFormInputsDisabled(false);
+      quizResult.style.display = "none";
       const firstInput = quizForm.querySelector("input");
       if (firstInput) {
         firstInput.focus();
@@ -1687,8 +1731,21 @@
       quizResult.textContent = `You answered ${correctAnswers} out of ${quizHistory.length} correctly.`;
       quizResult.className = "quiz-result " + (correctAnswers / Math.max(quizHistory.length, 1) >= 0.7 ? "correct" : "incorrect");
       quizResult.style.display = "block";
+      awaitingAdvance = false;
+      updateQuizControls({ canSubmit: false, canSkip: false, canAdvance: false });
+      quizForm.innerHTML = "";
+      currentQuestion = null;
       updateProgressSummary();
       renderHardVerbs();
+    }
+
+    function advanceToNextQuestion() {
+      if (!awaitingAdvance) return;
+      awaitingAdvance = false;
+      quizResult.style.display = "none";
+      updateQuizControls({ canSubmit: true, canSkip: true, canAdvance: false });
+      setQuizFormInputsDisabled(false);
+      nextQuestion();
     }
 
     quizForm.addEventListener("submit", (event) => {
@@ -1711,10 +1768,12 @@
       quizResult.style.display = "block";
       updateProgressSummary();
       renderHardVerbs();
-      setTimeout(() => {
-        quizResult.style.display = "none";
-        nextQuestion();
-      }, 1800);
+      setQuizFormInputsDisabled(true);
+      awaitingAdvance = true;
+      updateQuizControls({ canSubmit: false, canSkip: false, canAdvance: true });
+      if (nextQuestionBtn) {
+        nextQuestionBtn.focus();
+      }
     });
 
     skipQuestionBtn.addEventListener("click", () => {
@@ -1728,10 +1787,30 @@
       quizResult.style.display = "block";
       updateProgressSummary();
       renderHardVerbs();
-      setTimeout(() => {
-        quizResult.style.display = "none";
-        nextQuestion();
-      }, 1800);
+      setQuizFormInputsDisabled(true);
+      awaitingAdvance = true;
+      updateQuizControls({ canSubmit: false, canSkip: false, canAdvance: true });
+      if (nextQuestionBtn) {
+        nextQuestionBtn.focus();
+      }
+    });
+
+    if (nextQuestionBtn) {
+      nextQuestionBtn.addEventListener("click", () => {
+        advanceToNextQuestion();
+      });
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (!awaitingAdvance) return;
+      if (event.key === "Enter" || event.key === " " || event.key === "Space" || event.key === "Spacebar") {
+        const target = event.target;
+        if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+          return;
+        }
+        event.preventDefault();
+        advanceToNextQuestion();
+      }
     });
 
     selectAllBtn.addEventListener("click", selectAllCurrent);
