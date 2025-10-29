@@ -1519,10 +1519,15 @@
       const participle = verb.participle.toLowerCase().split(/\s*\/\s*/);
       const altPast = (verb.altPast || []).map((item) => item.toLowerCase());
       const altParticiple = (verb.altParticiple || []).map((item) => item.toLowerCase());
+      const translations = verb.translation
+        .toLowerCase()
+        .split(/\s*[;,\/]\s*/)
+        .filter(Boolean);
       return {
         base,
         past: new Set([...past, ...altPast]),
-        participle: new Set([...participle, ...altParticiple])
+        participle: new Set([...participle, ...altParticiple]),
+        translation: new Set(translations)
       };
     }
 
@@ -1648,20 +1653,69 @@
       }
     }
 
-    function buildQuizForm(question) {
-      quizForm.innerHTML = "";
-      if (question.type === "forms") {
-        quizPrompt.textContent = `Complete the forms for \"${question.verb.base}\".`;
-        quizForm.innerHTML = `
-          <label>Past <input type="text" name="past" autocomplete="off" required></label>
-          <label>Past participle <input type="text" name="participle" autocomplete="off" required></label>
-        `;
-      } else {
-        quizPrompt.textContent = `Translate into English: ${question.verb.translation}`;
-        quizForm.innerHTML = `
-          <label>Base form <input type="text" name="base" autocomplete="off" required></label>
-        `;
+    const QUIZ_FIELD_LABELS = {
+      base: "Base form",
+      past: "Past",
+      participle: "Past participle",
+      translation: "Catalan meaning"
+    };
+
+    const QUIZ_PROMPT_LABELS = {
+      base: "Base form",
+      past: "Past form",
+      participle: "Past participle",
+      translation: "Catalan meaning"
+    };
+
+    function describeRequestedAnswers(answerTypes) {
+      const normalizeLabel = (type) => {
+        if (type === "translation") {
+          return QUIZ_FIELD_LABELS[type];
+        }
+        return QUIZ_FIELD_LABELS[type].toLowerCase();
+      };
+      if (answerTypes.length === 1) {
+        return normalizeLabel(answerTypes[0]);
       }
+      const parts = answerTypes.map((type) => normalizeLabel(type));
+      const last = parts.pop();
+      return `${parts.join(", ")} and ${last}`;
+    }
+
+    function getVerbDisplayByType(type, verb) {
+      switch (type) {
+        case "base":
+          return verb.base;
+        case "past":
+          return verb.past;
+        case "participle":
+          return verb.participle;
+        case "translation":
+          return verb.translation;
+        default:
+          return "";
+      }
+    }
+
+    function buildQuizForm(question) {
+      const { promptType, answerTypes, verb } = question;
+      const requested = describeRequestedAnswers(answerTypes);
+      quizPrompt.textContent = `${QUIZ_PROMPT_LABELS[promptType]}: ${getVerbDisplayByType(promptType, verb)} — Provide the ${requested}.`;
+
+      const fragment = document.createDocumentFragment();
+      quizForm.innerHTML = "";
+      answerTypes.forEach((type) => {
+        const label = document.createElement("label");
+        label.textContent = QUIZ_FIELD_LABELS[type];
+        const input = document.createElement("input");
+        input.type = "text";
+        input.name = type;
+        input.autocomplete = "off";
+        input.required = true;
+        label.appendChild(input);
+        fragment.appendChild(label);
+      });
+      quizForm.appendChild(fragment);
     }
 
     function nextQuestion() {
@@ -1681,10 +1735,44 @@
       }
     }
 
+    const FORMS_TEMPLATE = { prompt: "base", answers: ["past", "participle"] };
+    const TRANSLATION_TEMPLATE = { prompt: "translation", answers: ["base"] };
+    const MIXED_TEMPLATES = [
+      { prompt: "base", answers: ["past"] },
+      { prompt: "base", answers: ["participle"] },
+      { prompt: "base", answers: ["past", "participle"] },
+      { prompt: "base", answers: ["translation"] },
+      { prompt: "past", answers: ["base"] },
+      { prompt: "past", answers: ["participle"] },
+      { prompt: "past", answers: ["translation"] },
+      { prompt: "participle", answers: ["base"] },
+      { prompt: "participle", answers: ["past"] },
+      { prompt: "participle", answers: ["translation"] },
+      { prompt: "translation", answers: ["base"] },
+      { prompt: "translation", answers: ["past"] },
+      { prompt: "translation", answers: ["participle"] }
+    ];
+
+    function pickMixedTemplate() {
+      const index = Math.floor(Math.random() * MIXED_TEMPLATES.length);
+      return MIXED_TEMPLATES[index];
+    }
+
     function createQuestion(verb) {
       const mode = quizModeSelect.value;
-      const type = mode === "mixed" ? (Math.random() > 0.5 ? "forms" : "translation") : mode;
-      return { verb, type };
+      let template;
+      if (mode === "forms") {
+        template = FORMS_TEMPLATE;
+      } else if (mode === "translation") {
+        template = TRANSLATION_TEMPLATE;
+      } else {
+        template = pickMixedTemplate();
+      }
+      return { verb, promptType: template.prompt, answerTypes: template.answers };
+    }
+
+    function formatCorrectAnswers(question) {
+      return question.answerTypes.map((type) => `${QUIZ_FIELD_LABELS[type]}: ${getVerbDisplayByType(type, question.verb)}`);
     }
 
     function evaluateAnswer(formData) {
@@ -1692,24 +1780,35 @@
       let correct = true;
       const feedback = [];
 
-      if (currentQuestion.type === "forms") {
-        const pastAnswer = (formData.get("past") || "").trim().toLowerCase();
-        const participleAnswer = (formData.get("participle") || "").trim().toLowerCase();
-        if (!info.past.has(pastAnswer)) {
+      currentQuestion.answerTypes.forEach((type) => {
+        const answer = (formData.get(type) || "").trim().toLowerCase();
+        if (!answer) {
           correct = false;
-          feedback.push(`Past: ${currentQuestion.verb.past}`);
+          feedback.push(`${QUIZ_FIELD_LABELS[type]}: ${getVerbDisplayByType(type, currentQuestion.verb)}`);
+          return;
         }
-        if (!info.participle.has(participleAnswer)) {
-          correct = false;
-          feedback.push(`Participle: ${currentQuestion.verb.participle}`);
+        if (type === "base") {
+          if (answer !== info.base) {
+            correct = false;
+            feedback.push(`${QUIZ_FIELD_LABELS[type]}: ${currentQuestion.verb.base}`);
+          }
+        } else if (type === "past") {
+          if (!info.past.has(answer)) {
+            correct = false;
+            feedback.push(`${QUIZ_FIELD_LABELS[type]}: ${currentQuestion.verb.past}`);
+          }
+        } else if (type === "participle") {
+          if (!info.participle.has(answer)) {
+            correct = false;
+            feedback.push(`${QUIZ_FIELD_LABELS[type]}: ${currentQuestion.verb.participle}`);
+          }
+        } else if (type === "translation") {
+          if (!info.translation.has(answer)) {
+            correct = false;
+            feedback.push(`${QUIZ_FIELD_LABELS[type]}: ${currentQuestion.verb.translation}`);
+          }
         }
-      } else {
-        const baseAnswer = (formData.get("base") || "").trim().toLowerCase();
-        if (baseAnswer !== info.base) {
-          correct = false;
-          feedback.push(`Base: ${currentQuestion.verb.base}`);
-        }
-      }
+      });
 
       return { correct, feedback };
     }
@@ -1782,7 +1881,8 @@
       recordResult(currentQuestion.verb, false);
       quizIndex += 1;
       renderQuizStatus();
-      quizResult.textContent = `Skipped. Correct forms: ${currentQuestion.verb.past} | ${currentQuestion.verb.participle}`;
+      const answers = formatCorrectAnswers(currentQuestion);
+      quizResult.textContent = `Skipped. Correct: ${answers.join(" | ")}`;
       quizResult.className = "quiz-result incorrect";
       quizResult.style.display = "block";
       updateProgressSummary();
